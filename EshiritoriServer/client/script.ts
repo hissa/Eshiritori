@@ -15,3 +15,8 @@ connection.setEventListener(SocketEvent.MessagePublished, data => {
 });
 connection.connect(new Player("hissa"));
 connection.publishMessage("hello");
+canvas.LineDrawedEvent = data => connection.draw(data);
+connection.setEventListener(SocketEvent.LineDrawed, data => {
+    if (data.player.id == connection.Id) return;
+    canvas.DrawByData(data.data);
+});

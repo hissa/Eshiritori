@@ -28,6 +28,7 @@ var Connections;
         SocketEvent[SocketEvent["PlayerConnected"] = 0] = "PlayerConnected";
         SocketEvent[SocketEvent["PlayerDisconnected"] = 1] = "PlayerDisconnected";
         SocketEvent[SocketEvent["MessagePublished"] = 2] = "MessagePublished";
+        SocketEvent[SocketEvent["LineDrawed"] = 3] = "LineDrawed";
     })(Connections.SocketEvent || (Connections.SocketEvent = {}));
     var SocketEvent = Connections.SocketEvent;
     ;
@@ -40,6 +41,13 @@ var Connections;
             this.socketio = io.connect(url);
             this.initEventListeners();
         }
+        Object.defineProperty(Connection.prototype, "Id", {
+            get: function () {
+                return this.socketio.id;
+            },
+            enumerable: true,
+            configurable: true
+        });
         /**
          * 部屋に接続します。
          * @param player プレイヤーの情報
@@ -55,6 +63,9 @@ var Connections;
         Connection.prototype.publishMessage = function (message) {
             this.socketio.emit("Publish", { value: message });
         };
+        Connection.prototype.draw = function (data) {
+            this.socketio.emit("Drawing", data);
+        };
         /**
          * Socket.IOのイベントに対してイベントリスナーをセットします。
          * @param event イベントの種類
@@ -65,8 +76,10 @@ var Connections;
             this.socketio.on(SocketEvent[event], func);
         };
         Connection.prototype.initEventListeners = function () {
-            this.socketio.on("MessagePublished", function () { });
-            this.socketio.on("PlayerConnected", function () { });
+            this.socketio.on(SocketEvent[SocketEvent.MessagePublished], function () { });
+            this.socketio.on(SocketEvent[SocketEvent.PlayerConnected], function () { });
+            this.socketio.on(SocketEvent[SocketEvent.PlayerDisconnected], function () { });
+            this.socketio.on(SocketEvent[SocketEvent.LineDrawed], function () { });
         };
         return Connection;
     }());

@@ -17,6 +17,8 @@ var MyCanvas;
          * @param canvas 対象のHTMLのCanvas要素
          */
         function Canvas(canvas) {
+            // イベント
+            this.lineDrawedEvent = function () { };
             this.canvas = canvas;
             this.ctx = canvas.getContext("2d");
             this.point = new Point();
@@ -56,6 +58,27 @@ var MyCanvas;
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(Canvas.prototype, "LineDrawedEvent", {
+            set: function (func) {
+                this.lineDrawedEvent = func;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        /**
+         * 渡されたデータから描画します。
+         * @param data データ
+         */
+        Canvas.prototype.DrawByData = function (data) {
+            this.ctx.lineCap = LineCap[data.pen.cap];
+            this.ctx.strokeStyle = data.pen.color;
+            this.ctx.lineWidth = data.pen.width;
+            this.ctx.beginPath();
+            this.ctx.moveTo(data.befor.x, data.befor.y);
+            this.ctx.lineTo(data.point.x, data.point.y);
+            this.ctx.stroke();
+            this.ctx.closePath();
+        };
         Canvas.prototype.addEventListeners = function () {
             var _this = this;
             this.canvas.addEventListener("mousemove", function (e) { return _this.mouseMove(e); });
@@ -88,6 +111,12 @@ var MyCanvas;
             this.ctx.lineTo(this.point.X, this.point.Y);
             this.ctx.stroke();
             this.ctx.closePath();
+            // イベント発火
+            this.lineDrawedEvent({
+                pen: this.pen.ToHash(),
+                befor: this.beforPoint.ToHash(),
+                point: this.point.ToHash()
+            });
             this.beforPoint = this.point;
         };
         return Canvas;
@@ -128,6 +157,15 @@ var MyCanvas;
             enumerable: true,
             configurable: true
         });
+        /**
+         * 保持している情報をハッシュテーブルとして返します。
+         */
+        Point.prototype.ToHash = function () {
+            return {
+                x: this.X,
+                y: this.Y
+            };
+        };
         return Point;
     }());
     MyCanvas.Point = Point;
@@ -179,6 +217,16 @@ var MyCanvas;
             enumerable: true,
             configurable: true
         });
+        /**
+         * 保持しているデータをハッシュテーブルとして返します。
+         */
+        Pen.prototype.ToHash = function () {
+            return {
+                width: this.Width,
+                color: this.Color,
+                cap: this.Cap
+            };
+        };
         return Pen;
     }());
 })(MyCanvas || (MyCanvas = {}));

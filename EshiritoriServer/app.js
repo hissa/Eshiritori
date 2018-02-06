@@ -20,6 +20,7 @@ var io = socketio.listen(server);
 var users = {};
 io.sockets.on("connection", function (socket) {
     // Define Events
+    // プレイヤーが接続
     socket.on("Connected", function (name) {
         users[socket.id] = name;
         io.sockets.emit("PlayerConnected", {
@@ -30,16 +31,18 @@ io.sockets.on("connection", function (socket) {
         });
         console.log("Connected: " + name);
     });
+    // メッセージ投稿
     socket.on("Publish", function (data) {
         io.sockets.emit("MessagePublished", {
             value: data.value,
             player: {
                 name: users[socket.id],
-                socketId: socket.id
+                id: socket.id
             }
         });
         console.log("Published: [" + users[socket.id] + "]" + data.value);
     });
+    // プレイヤーが切断
     socket.on("disconnect", function () {
         if (users[socket.id]) {
             var name_1 = users[socket.id];
@@ -47,11 +50,21 @@ io.sockets.on("connection", function (socket) {
             io.sockets.emit("PlayerDisconnected", {
                 player: {
                     name: name_1,
-                    socketId: socket.id
+                    id: socket.id
                 }
             });
             console.log("Disconnected: " + name_1);
         }
+    });
+    // 線の情報が到着
+    socket.on("Drawing", function (data) {
+        io.sockets.emit("LineDrawed", {
+            player: {
+                name: users[socket.id],
+                id: socket.id
+            },
+            data: data
+        });
     });
 });
 //# sourceMappingURL=app.js.map

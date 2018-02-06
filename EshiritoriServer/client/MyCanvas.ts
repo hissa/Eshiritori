@@ -14,6 +14,8 @@
         private point: Point;
         private isDrawing: boolean;
         private pen: Pen;
+        // イベント
+        private lineDrawedEvent: (data: any) => void = () => { };
 
         // アクセサ
         get LineWidth(): number {
@@ -37,6 +39,10 @@
             this.pen.Cap = value;
         }
 
+        set LineDrawedEvent(func: (data: any) => void) {
+            this.lineDrawedEvent = func;
+        }
+
         /**
          * Canvasクラスのコンストラクター
          * @param canvas 対象のHTMLのCanvas要素
@@ -49,6 +55,21 @@
             this.isDrawing = false;
             this.pen = new Pen();
             this.addEventListeners();
+        }
+
+        /**
+         * 渡されたデータから描画します。
+         * @param data データ
+         */
+        public DrawByData(data: any) {
+            this.ctx.lineCap = LineCap[data.pen.cap];
+            this.ctx.strokeStyle = data.pen.color;
+            this.ctx.lineWidth = data.pen.width;
+            this.ctx.beginPath();
+            this.ctx.moveTo(data.befor.x, data.befor.y);
+            this.ctx.lineTo(data.point.x, data.point.y);
+            this.ctx.stroke();
+            this.ctx.closePath();
         }
 
         private addEventListeners() {
@@ -70,7 +91,6 @@
             let target = <HTMLElement>e.target;
             let rect = target.getBoundingClientRect();
             this.beforPoint = new Point(e.clientX - rect.left, e.clientY - rect.top);
-
         }
 
         private mouseUp(e: MouseEvent) {
@@ -86,6 +106,12 @@
             this.ctx.lineTo(this.point.X, this.point.Y);
             this.ctx.stroke();
             this.ctx.closePath();
+            // イベント発火
+            this.lineDrawedEvent({
+                pen: this.pen.ToHash(),
+                befor: this.beforPoint.ToHash(),
+                point: this.point.ToHash()
+            });
             this.beforPoint = this.point;
         }
     }
@@ -119,6 +145,16 @@
         constructor(x: number = 0, y: number = 0) {
             this.X = x;
             this.Y = y;
+        }
+
+        /**
+         * 保持している情報をハッシュテーブルとして返します。
+         */
+        public ToHash(): any {
+            return {
+                x: this.X,
+                y: this.Y
+            };
         }
     }
 
@@ -161,6 +197,17 @@
             this.Width = width;
             this.Color = color;
             this.Cap = cap;
+        }
+
+        /**
+         * 保持しているデータをハッシュテーブルとして返します。
+         */
+        public ToHash(): any {
+            return {
+                width: this.Width,
+                color: this.Color,
+                cap: this.Cap
+            };
         }
     }
 }

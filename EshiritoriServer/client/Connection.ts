@@ -24,12 +24,17 @@
     export enum SocketEvent {
         PlayerConnected,
         PlayerDisconnected,
-        MessagePublished
+        MessagePublished,
+        LineDrawed
     };
 
     export class Connection {
         private socketio: any;
         private player: Player;
+
+        get Id(): string {
+            return this.socketio.id;
+        }
 
         /**
          * Connectionクラスのコンストラクタ
@@ -57,6 +62,10 @@
             this.socketio.emit("Publish", { value: message });
         }
 
+        public draw(data: any) {
+            this.socketio.emit("Drawing", data);
+        }
+
         /**
          * Socket.IOのイベントに対してイベントリスナーをセットします。
          * @param event イベントの種類
@@ -68,8 +77,10 @@
         }
 
         private initEventListeners() {
-            this.socketio.on("MessagePublished", () => { });
-            this.socketio.on("PlayerConnected", () => { });
+            this.socketio.on(SocketEvent[SocketEvent.MessagePublished], () => { });
+            this.socketio.on(SocketEvent[SocketEvent.PlayerConnected], () => { });
+            this.socketio.on(SocketEvent[SocketEvent.PlayerDisconnected], () => { });
+            this.socketio.on(SocketEvent[SocketEvent.LineDrawed], () => { });
         }
     }
 }

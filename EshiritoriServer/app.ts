@@ -26,6 +26,7 @@ let users = {};
 io.sockets.on("connection", socket => {
 
     // Define Events
+    // プレイヤーが接続
     socket.on("Connected", name => {
         users[socket.id] = name;
         io.sockets.emit("PlayerConnected", {
@@ -36,16 +37,18 @@ io.sockets.on("connection", socket => {
         });
         console.log(`Connected: ${name}`);
     });
+    // メッセージ投稿
     socket.on("Publish", data => {
         io.sockets.emit("MessagePublished", {
             value: data.value,
             player: {
                 name: users[socket.id],
-                socketId: socket.id
+                id: socket.id
             }
         });
         console.log(`Published: [${users[socket.id]}]${data.value}`);
     });
+    // プレイヤーが切断
     socket.on("disconnect", () => {
         if (users[socket.id]) {
             let name = users[socket.id];
@@ -53,10 +56,20 @@ io.sockets.on("connection", socket => {
             io.sockets.emit("PlayerDisconnected", {
                 player: {
                     name: name,
-                    socketId: socket.id
+                    id: socket.id
                 }
             });
             console.log(`Disconnected: ${name}`);
         }
+    });
+    // 線の情報が到着
+    socket.on("Drawing", data => {
+        io.sockets.emit("LineDrawed", {
+            player: {
+                name: users[socket.id],
+                id: socket.id
+            },
+            data
+        });
     });
 });

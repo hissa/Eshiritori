@@ -15,4 +15,10 @@ connection.setEventListener(SocketEvent.MessagePublished, function (data) {
 });
 connection.connect(new Player("hissa"));
 connection.publishMessage("hello");
+canvas.LineDrawedEvent = function (data) { return connection.draw(data); };
+connection.setEventListener(SocketEvent.LineDrawed, function (data) {
+    if (data.player.id == connection.Id)
+        return;
+    canvas.DrawByData(data.data);
+});
 //# sourceMappingURL=script.js.map
