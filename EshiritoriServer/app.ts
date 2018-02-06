@@ -3,41 +3,60 @@ const http = require("http");
 const socketio = require("socket.io");
 const app = require("express")();
 
+
+// Create Server
 const server = http.Server(app);
 server.listen(11451, () => {
     console.log("Server is running...");
 });
 
-app.get("/", (req, res) => {
-    res.sendFile(`${__dirname}/client/index.html`);
-});
-app.get("/script.js", (req, res) => {
-    res.sendFile(`${__dirname}/client/script.js`);
-});
-app.get("/MyCanvas.js", (req, res) => {
-    res.sendFile(`${__dirname}/client/MyCanvas.js`);
-});
-app.get("/style.css", (req, res) => {
-    res.sendFile(`${__dirname}/client/style.css`);
+// Routing
+app.get("/:file", (req, res) => {
+    if (req.params.file == "/") {
+        res.sendFile(`${__dirname}/client/index.html`);
+        return;
+    }
+    res.sendFile(`${__dirname}/client/${req.params.file}`);
 });
 
+// Use Socket.IO
 const io = socketio.listen(server);
 
 let users = {};
 io.sockets.on("connection", socket => {
-    socket.on("connected", name => {
-        let msg = `${name}さんが入室しました。`;
+
+    // Define Events
+    socket.on("Connected", name => {
         users[socket.id] = name;
-        io.sockets.emit("publish", { value: msg });
+        io.sockets.emit("PlayerConnected", {
+            player: {
+                name: name,
+                id: socket.id
+            }
+        });
+        console.log(`Connected: ${name}`);
     });
-    socket.on("publish", data => {
-        io.sockets.emit("publish", { value: data.value });
+    socket.on("Publish", data => {
+        io.sockets.emit("MessagePublished", {
+            value: data.value,
+            player: {
+                name: users[socket.id],
+                socketId: socket.id
+            }
+        });
+        console.log(`Published: [${users[socket.id]}]${data.value}`);
     });
     socket.on("disconnect", () => {
         if (users[socket.id]) {
-            let msg = `${users[socket.id]}さんが退室しました。`;
+            let name = users[socket.id];
             delete users[socket.id];
-            io.sockets.emit("publish", { value: msg });
+            io.sockets.emit("PlayerDisconnected", {
+                player: {
+                    name: name,
+                    socketId: socket.id
+                }
+            });
+            console.log(`Disconnected: ${name}`);
         }
     });
 });

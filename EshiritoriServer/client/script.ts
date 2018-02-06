@@ -1,25 +1,17 @@
-﻿//const socketioc = io.connect("http://localhost:11451");
-//socketioc.on("connected", name => { });
-//socketioc.on("publish", data => addMessage(data.value));
-//socketioc.on("disconnect", () => { });
-
-//const start = (name) => {
-//    socketioc.emit("connected", name);
-//};
-
-//const publishMessage = (name, message) => {
-//    let msg = `[${name}] ${message}`;
-//    socketioc.emit("publish", { value: msg });
-//};
-
-//const addMessage = (msg) => {
-//    console.log(msg);
-//}
-
-//let myName = "default";
-//addMessage(`${myName}として入室しました。`);
-//start(myName);
-
-import Canvas = MyCanvas;
-let canvas = new Canvas.Canvas(<HTMLCanvasElement>document.getElementById("canvas"));
-console.log(canvas);
+﻿import Canvas = MyCanvas.Canvas;
+import Connection = Connections.Connection;
+import SocketEvent = Connections.SocketEvent;
+import Player = Connections.Player;
+let canvas = new Canvas(<HTMLCanvasElement>document.getElementById("canvas"));
+let connection = new Connection("http://localhost:11451");
+connection.setEventListener(SocketEvent.PlayerConnected, data => {
+    console.log(`${data.player.name}が入室`);
+});
+connection.setEventListener(SocketEvent.PlayerDisconnected, data => {
+    console.log(`${data.player.name}が退室`);
+});
+connection.setEventListener(SocketEvent.MessagePublished, data => {
+    console.log(`[${data.player.name}]${data.value}`);
+});
+connection.connect(new Player("hissa"));
+connection.publishMessage("hello");

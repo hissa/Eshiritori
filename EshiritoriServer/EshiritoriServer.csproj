@@ -23,15 +23,22 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="app.ts" />
-    <TypeScriptCompile Include="client\MyCanvas.ts" />
-    <TypeScriptCompile Include="client\script.ts" />
+    <TypeScriptCompile Include="client\Connection.ts" />
+    <TypeScriptCompile Include="client\MyCanvas.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
+    <TypeScriptCompile Include="client\script.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
     <TypeScriptCompile Include="Scripts\typings\node\node.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\socket.io\socket.io.d.ts" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="client\index.html" />
+    <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="packages.config" />
+    <Content Include="client\style.css" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">12.0</VisualStudioVersion>

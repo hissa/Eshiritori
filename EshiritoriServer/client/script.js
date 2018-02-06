@@ -1,21 +1,18 @@
-//const socketioc = io.connect("http://localhost:11451");
-//socketioc.on("connected", name => { });
-//socketioc.on("publish", data => addMessage(data.value));
-//socketioc.on("disconnect", () => { });
-//const start = (name) => {
-//    socketioc.emit("connected", name);
-//};
-//const publishMessage = (name, message) => {
-//    let msg = `[${name}] ${message}`;
-//    socketioc.emit("publish", { value: msg });
-//};
-//const addMessage = (msg) => {
-//    console.log(msg);
-//}
-//let myName = "default";
-//addMessage(`${myName}として入室しました。`);
-//start(myName);
-var Canvas = MyCanvas;
-var canvas = new Canvas.Canvas(document.getElementById("canvas"));
-console.log(canvas);
+var Canvas = MyCanvas.Canvas;
+var Connection = Connections.Connection;
+var SocketEvent = Connections.SocketEvent;
+var Player = Connections.Player;
+var canvas = new Canvas(document.getElementById("canvas"));
+var connection = new Connection("http://localhost:11451");
+connection.setEventListener(SocketEvent.PlayerConnected, function (data) {
+    console.log(data.player.name + "\u304C\u5165\u5BA4");
+});
+connection.setEventListener(SocketEvent.PlayerDisconnected, function (data) {
+    console.log(data.player.name + "\u304C\u9000\u5BA4");
+});
+connection.setEventListener(SocketEvent.MessagePublished, function (data) {
+    console.log("[" + data.player.name + "]" + data.value);
+});
+connection.connect(new Player("hissa"));
+connection.publishMessage("hello");
 //# sourceMappingURL=script.js.map
