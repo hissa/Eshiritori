@@ -149,5 +149,256 @@ var Components;
         return CardPanel;
     }(Component));
     Components.CardPanel = CardPanel;
+    /**
+     * 情報を表示するAlertを表すクラス
+     */
+    var InfomationBar = (function (_super) {
+        __extends(InfomationBar, _super);
+        /**
+         * コンストラクタ
+         * @param defaultInfomation 初期状態の情報
+         */
+        function InfomationBar(defaultInfomation) {
+            if (defaultInfomation === void 0) { defaultInfomation = InformationType.None; }
+            _super.call(this);
+            this.isGenerated = false;
+            this.informationType = InformationType.None;
+            this.object = null;
+            this.unique = null;
+            this.InformationType = defaultInfomation;
+        }
+        Object.defineProperty(InfomationBar.prototype, "IsGenerated", {
+            get: function () {
+                return this.isGenerated;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(InfomationBar.prototype, "InformationType", {
+            get: function () {
+                return this.informationType;
+            },
+            set: function (value) {
+                this.informationType = value;
+                this.reload();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        /**
+         * 指定された親要素にコンポーネントを追加します。
+         * @param parent 追加する親要素
+         * @param idName 一意なidに使われる文字列を指定できます。（省略可）
+         */
+        InfomationBar.prototype.Generate = function (parent, idName) {
+            this.unique = idName != undefined ? idName : UniqueIdGenerater.Get().toString();
+            parent.append("<div id=\"informationbar" + this.unique + "\" />");
+            this.object = $("#informationbar" + this.unique);
+            this.isGenerated = true;
+            this.reload();
+        };
+        InfomationBar.prototype.reload = function () {
+            if (!this.IsGenerated)
+                return;
+            this.clear();
+            switch (this.InformationType) {
+                case InformationType.None:
+                    this.none();
+                    break;
+                case InformationType.YourTurn:
+                    this.yourTurn();
+                    break;
+                default:
+                    break;
+            }
+        };
+        InfomationBar.prototype.clear = function () {
+            this.object.removeClass();
+            this.object.text("");
+        };
+        InfomationBar.prototype.yourTurn = function () {
+            this.object.addClass("alert alert-danger");
+            this.object.text("あなたの番です");
+            this.object.show();
+        };
+        InfomationBar.prototype.none = function () {
+            this.object.hide();
+        };
+        return InfomationBar;
+    }(Component));
+    Components.InfomationBar = InfomationBar;
+    // InformationBarで表示する情報の種類
+    (function (InformationType) {
+        InformationType[InformationType["None"] = 0] = "None";
+        InformationType[InformationType["YourTurn"] = 1] = "YourTurn";
+    })(Components.InformationType || (Components.InformationType = {}));
+    var InformationType = Components.InformationType;
+    ;
+    /**
+     * Bootstrap4のtableで表示するPlayerList
+     */
+    var PlayerList = (function (_super) {
+        __extends(PlayerList, _super);
+        /**
+         * コンストラクタ
+         */
+        function PlayerList() {
+            _super.call(this);
+            this.isGenerated = false;
+            this.players = [];
+            this.object = null;
+            this.theadObject = null;
+            this.tbodyObject = null;
+            // playerIdをキーとした連想配列
+            this.nameCellObjects = [];
+            this.currentPlayerId = null;
+            this.unique = null;
+        }
+        Object.defineProperty(PlayerList.prototype, "IsGenerated", {
+            get: function () {
+                return this.isGenerated;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(PlayerList.prototype, "Players", {
+            get: function () {
+                return this.players;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(PlayerList.prototype, "CurrentPlayer", {
+            set: function (value) {
+                this.currentPlayerId = value.Id;
+                this.reload();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        /**
+         * 指定された親要素にコンポーネントを追加
+         * @param parent 追加する親要素
+         * @param idName 一意なidに使われる文字列を指定できます。（省略可）
+         */
+        PlayerList.prototype.Generate = function (parent, idName) {
+            this.unique = idName != undefined ? idName : UniqueIdGenerater.Get().toString();
+            parent.append("<table id=\"playerlist" + this.unique + "\" />");
+            this.object = $("#playerlist" + this.unique);
+            this.object.addClass("table");
+            this.object.append("<thead id=\"playerlistHead" + this.unique + "\" />");
+            this.theadObject = $("#playerlistHead" + this.unique);
+            this.object.append("<tbody id=\"playerlistBody" + this.unique + "\" />");
+            this.tbodyObject = $("#playerlistBody" + this.unique);
+            this.isGenerated = true;
+            this.reload();
+        };
+        /**
+         * プレイヤーを追加します。
+         * @param player 追加するプレイヤー
+         */
+        PlayerList.prototype.addPlayer = function (player) {
+            this.players.push(player);
+            this.reload();
+        };
+        PlayerList.prototype.reload = function () {
+            var _this = this;
+            if (!this.IsGenerated)
+                return;
+            this.tbodyObject.empty();
+            this.nameCellObjects = [];
+            this.players.forEach(function (player, index) {
+                _this.tbodyObject.append("<tr id=\"playerlistRow" + _this.unique + "-" + index + "\" />");
+                $("#playerlistRow" + _this.unique + "-" + index)
+                    .append("<td id=\"playerlistNameCell" + _this.unique + "-" + index + "\" />");
+                var current = $("#playerlistNameCell" + _this.unique + "-" + index);
+                _this.nameCellObjects[player.Id] = current;
+                current.text(player.Name);
+                if (player.Id == _this.currentPlayerId) {
+                    current.addClass("table-danger");
+                }
+            });
+        };
+        return PlayerList;
+    }(Component));
+    Components.PlayerList = PlayerList;
+    /**
+     * 主にPlayerListで使用するプレイヤーの情報
+     */
+    var Player = (function () {
+        /**
+         * コンストラクタ
+         * @param id ソケットID
+         * @param name 名前
+         */
+        function Player(id, name) {
+            this.id = id;
+            this.name = name;
+        }
+        Object.defineProperty(Player.prototype, "Id", {
+            get: function () {
+                return this.id;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Player.prototype, "Name", {
+            get: function () {
+                return this.name;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        return Player;
+    }());
+    Components.Player = Player;
+    var ChatLog = (function (_super) {
+        __extends(ChatLog, _super);
+        function ChatLog() {
+            _super.call(this);
+            this.isGenerated = false;
+        }
+        Object.defineProperty(ChatLog.prototype, "IsGenerated", {
+            get: function () {
+                return this.isGenerated;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        ChatLog.prototype.Generate = function (parent, idName) {
+        };
+        return ChatLog;
+    }(Component));
+    Components.ChatLog = ChatLog;
+    /**
+     * 主にChatLogで使用するチャットのメッセージを表すクラス
+     */
+    var ChatMessage = (function () {
+        /**
+         * コンストラクタ
+         * @param sender 発信者
+         * @param message メッセージ本文
+         */
+        function ChatMessage(sender, message) {
+            this.sender = sender;
+            this.message = message;
+        }
+        Object.defineProperty(ChatMessage.prototype, "Sender", {
+            get: function () {
+                return this.sender;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(ChatMessage.prototype, "Message", {
+            get: function () {
+                return this.message;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        return ChatMessage;
+    }());
+    Components.ChatMessage = ChatMessage;
 })(Components || (Components = {}));
 //# sourceMappingURL=Components.js.map

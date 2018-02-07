@@ -72,3 +72,7 @@ div {
 #cardpaneldrawlog{
     height: 100%;
 }
+
+#informationbaryourturn{
+    text-align: center;
+}

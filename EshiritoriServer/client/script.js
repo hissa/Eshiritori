@@ -31,10 +31,24 @@ chat.ContentText = "チャットとか";
 chat.Generate($("#chat"), "chat");
 var playerListBox = new Components.CardPanel();
 playerListBox.HeaderText = "プレイヤーリスト";
-playerListBox.ContentText = "プレイヤーリストとか";
 playerListBox.Generate($("#playerList"), "players");
 var drawlog = new Components.CardPanel();
 drawlog.HeaderText = "ログ";
 drawlog.ContentText = "ここに過去の絵たちを表示";
 drawlog.Generate($("#drawlog"), "drawlog");
+var infoBar = new Components.InfomationBar();
+infoBar.Generate($("#yourTurn"), "yourturn");
+infoBar.InformationType = Components.InformationType.YourTurn;
+var playerList = new Components.PlayerList();
+playerList.addPlayer(new Components.Player("aaa", "hissa"));
+playerList.addPlayer(new Components.Player("bbb", "shieru"));
+playerList.addPlayer(new Components.Player("ccc", "drizzle"));
+playerList.CurrentPlayer = new Components.Player("bbb", "shieru");
+playerList.Generate($("#cardpanelContentplayers"), "playerlist");
+setTimeout(function () {
+    playerList.addPlayer(new Components.Player("ddd", "alicia"));
+}, 1000);
+setTimeout(function () {
+    playerList.CurrentPlayer = new Components.Player("aaa", "hissa");
+}, 2000);
 //# sourceMappingURL=script.js.map

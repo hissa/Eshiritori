@@ -118,4 +118,232 @@ namespace Components {
             if (this.HasFooter) this.footerObject.text(this.FooterText);
         }
     }
+
+    /**
+     * 情報を表示するAlertを表すクラス
+     */
+    export class InfomationBar extends Component {
+        private isGenerated = false;
+        private informationType = InformationType.None;
+        private object: JQuery = null;
+        private unique: string = null;
+
+        get IsGenerated(): boolean {
+            return this.isGenerated;
+        }
+
+        get InformationType(): InformationType {
+            return this.informationType;
+        }
+        set InformationType(value: InformationType) {
+            this.informationType = value;
+            this.reload();
+        }
+
+        /**
+         * コンストラクタ  
+         * @param defaultInfomation 初期状態の情報
+         */
+        constructor(defaultInfomation = InformationType.None) {
+            super();
+            this.InformationType = defaultInfomation;
+        }
+
+        /**
+         * 指定された親要素にコンポーネントを追加します。
+         * @param parent 追加する親要素
+         * @param idName 一意なidに使われる文字列を指定できます。（省略可）
+         */
+        public Generate(parent: JQuery, idName?: string) {
+            this.unique = idName != undefined ? idName : UniqueIdGenerater.Get().toString();
+            parent.append(`<div id="informationbar${this.unique}" />`);
+            this.object = $(`#informationbar${this.unique}`);
+            this.isGenerated = true;
+            this.reload();
+        }
+
+        private reload() {
+            if (!this.IsGenerated) return;
+            this.clear();
+            switch (this.InformationType) {
+                case InformationType.None:
+                    this.none();
+                    break;
+                case InformationType.YourTurn:
+                    this.yourTurn();
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private clear() {
+            this.object.removeClass();
+            this.object.text("");
+        }
+
+        private yourTurn() {
+            this.object.addClass("alert alert-danger");
+            this.object.text("あなたの番です");
+            this.object.show();
+        }
+
+        private none() {
+            this.object.hide();
+        }
+
+    }
+
+    // InformationBarで表示する情報の種類
+    export enum InformationType {
+        None,
+        YourTurn
+    };
+
+    /**
+     * Bootstrap4のtableで表示するPlayerList
+     */
+    export class PlayerList extends Component {
+        private isGenerated = false;
+        private players: Player[] = [];
+        private object: JQuery = null;
+        private theadObject: JQuery = null;
+        private tbodyObject: JQuery = null;
+        // playerIdをキーとした連想配列
+        private nameCellObjects: JQuery[] = [];
+        private currentPlayerId: string = null;
+        private unique: string = null;
+
+        get IsGenerated(): boolean {
+            return this.isGenerated;
+        }
+
+        get Players(): Player[] {
+            return this.players;
+        }
+
+        set CurrentPlayer(value: Player) {
+            this.currentPlayerId = value.Id;
+            this.reload();
+        }
+
+        /**
+         * コンストラクタ
+         */
+        constructor() {
+            super();
+        }
+
+        /**
+         * 指定された親要素にコンポーネントを追加
+         * @param parent 追加する親要素
+         * @param idName 一意なidに使われる文字列を指定できます。（省略可）
+         */
+        public Generate(parent: JQuery, idName?: string) {
+            this.unique = idName != undefined ? idName : UniqueIdGenerater.Get().toString();
+            parent.append(`<table id="playerlist${this.unique}" />`);
+            this.object = $(`#playerlist${this.unique}`);
+            this.object.addClass("table");
+            this.object.append(`<thead id="playerlistHead${this.unique}" />`);
+            this.theadObject = $(`#playerlistHead${this.unique}`);
+            this.object.append(`<tbody id="playerlistBody${this.unique}" />`);
+            this.tbodyObject = $(`#playerlistBody${this.unique}`);
+            this.isGenerated = true;
+            this.reload();
+        }
+
+        /**
+         * プレイヤーを追加します。
+         * @param player 追加するプレイヤー
+         */
+        public addPlayer(player: Player) {
+            this.players.push(player);
+            this.reload();
+        }
+
+        private reload() {
+            if (!this.IsGenerated) return;
+            this.tbodyObject.empty();
+            this.nameCellObjects = [];
+            this.players.forEach((player, index) => {
+                this.tbodyObject.append(`<tr id="playerlistRow${this.unique}-${index}" />`);
+                $(`#playerlistRow${this.unique}-${index}`)
+                    .append(`<td id="playerlistNameCell${this.unique}-${index}" />`);
+                let current = $(`#playerlistNameCell${this.unique}-${index}`);
+                this.nameCellObjects[player.Id] = current;
+                current.text(player.Name);
+                if (player.Id == this.currentPlayerId) {
+                    current.addClass("table-danger");
+                }
+            });
+        }
+    }
+
+    /**
+     * 主にPlayerListで使用するプレイヤーの情報
+     */
+    export class Player {
+        private id: string;
+        private name: string;
+
+        get Id(): string {
+            return this.id;
+        }
+
+        get Name(): string {
+            return this.name;
+        }
+
+        /**
+         * コンストラクタ
+         * @param id ソケットID
+         * @param name 名前
+         */
+        constructor(id: string, name: string) {
+            this.id = id;
+            this.name = name;
+        }
+    }
+
+    export class ChatLog extends Component {
+        private isGenerated = false;
+
+        get IsGenerated(): boolean {
+            return this.isGenerated;
+        }
+
+        constructor() {
+            super();
+        }
+
+        public Generate(parent: JQuery, idName?: string) {
+
+        }
+    }
+
+    /**
+     * 主にChatLogで使用するチャットのメッセージを表すクラス
+     */
+    export class ChatMessage {
+        private sender: string;
+        private message: string;
+
+        get Sender(): string {
+            return this.sender;
+        }
+
+        get Message(): string {
+            return this.message;
+        }
+
+        /**
+         * コンストラクタ
+         * @param sender 発信者
+         * @param message メッセージ本文
+         */
+        constructor(sender: string, message: string) {
+            this.sender = sender;
+            this.message = message;
+        }
+    }
 }
