@@ -9,7 +9,7 @@ div {
     /*border: solid;*/
 }
 
-#column1{
+#mainArea{
     width: 740px;
     height: 600px;
     float: left;
@@ -33,24 +33,10 @@ div {
     float: left;
 }
 
-#logs{
+#drawlog{
     width: 1390px;
     height: 200px;
     clear: both;
-}
-
-.log{
-    width: 200px;
-    height: 140px;
-    float: left;
-    margin-left: 10px;
-    margin-top: 40px;
-}
-
-.log0{
-    width: 286px;
-    height: 200px;
-    margin: 0;
 }
 
 .mainCanvas{
@@ -59,23 +45,30 @@ div {
 }
 
 #yourTurn{
-    height: 20px;
-    width: 700px;
-    margin-left: 20px;
-}
-
-#chatLog{
-    height:500px;
-}
-
-#chatInput{
     height: 50px;
+    width: 100%;
+}
+
+#chat{
+    height:600px;
 }
 
 #toolBox{
-    height: 550px;
+    height: 100%;
 }
 
 #cardpanelpalet{
-    height: 550px;
+    height: 100%;
+}
+
+#cardpanelchat{
+    height: 100%;
+}
+
+#cardpanelplayers{
+    height: 100%;
+}
+
+#cardpaneldrawlog{
+    height: 100%;
 }

@@ -24,6 +24,9 @@ namespace Components {
         }
     }
 
+    /**
+     * Bootstrap4のCardを表すクラス(Bootstrap3のPanel的な)
+     */
     export class CardPanel extends Component{
         private headerText: string = "";
         private contentText: string = "";

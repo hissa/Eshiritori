@@ -36,6 +36,9 @@ var Components;
         UniqueIdGenerater.number = 0;
         return UniqueIdGenerater;
     }());
+    /**
+     * Bootstrap4のCardを表すクラス(Bootstrap3のPanel的な)
+     */
     var CardPanel = (function (_super) {
         __extends(CardPanel, _super);
         /**

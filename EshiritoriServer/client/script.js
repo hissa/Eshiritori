@@ -25,4 +25,16 @@ var toolbox = new Components.CardPanel();
 toolbox.HeaderText = "パレット";
 toolbox.ContentText = "テスト";
 toolbox.Generate($("#toolBox"), "palet");
+var chat = new Components.CardPanel();
+chat.HeaderText = "チャット";
+chat.ContentText = "チャットとか";
+chat.Generate($("#chat"), "chat");
+var playerListBox = new Components.CardPanel();
+playerListBox.HeaderText = "プレイヤーリスト";
+playerListBox.ContentText = "プレイヤーリストとか";
+playerListBox.Generate($("#playerList"), "players");
+var drawlog = new Components.CardPanel();
+drawlog.HeaderText = "ログ";
+drawlog.ContentText = "ここに過去の絵たちを表示";
+drawlog.Generate($("#drawlog"), "drawlog");
 //# sourceMappingURL=script.js.map
