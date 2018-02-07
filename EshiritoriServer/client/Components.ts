@@ -307,17 +307,41 @@ namespace Components {
 
     export class ChatLog extends Component {
         private isGenerated = false;
+        private messages: ChatMessage[] = [];
+        private maxDisplayNumber: number;
+        private object: JQuery = null;
+        private unique: string;
 
         get IsGenerated(): boolean {
             return this.isGenerated;
         }
 
-        constructor() {
+        constructor(maxDisplay = 10) {
             super();
+            this.maxDisplayNumber = maxDisplay;
         }
 
         public Generate(parent: JQuery, idName?: string) {
+            this.unique = idName != undefined ? idName : UniqueIdGenerater.Get().toString();
+            parent.append(`<div id="chatlog${this.unique}" />`);
+            this.object = $(`#chatlog${this.unique}`);
+            this.isGenerated = true;
+        }
 
+        public addMessage(message: ChatMessage) {
+            this.messages.push(message);
+            this.reload();
+        }
+
+        private reload() {
+            if (!this.IsGenerated) return;
+            this.object.empty();
+            let start = this.messages.length - this.maxDisplayNumber;
+            if (start < 0) start = 0;
+            let end = this.messages.length - 1;
+            for (let i = start; i <= end; i++) {
+                this.object.append(`<p>${this.messages[i].Sender}: ${this.messages[i].Message}</p>`);
+            }
         }
     }
 

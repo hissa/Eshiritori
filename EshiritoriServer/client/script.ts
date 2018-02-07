@@ -27,7 +27,6 @@ toolbox.ContentText = "テスト";
 toolbox.Generate($("#toolBox"), "palet");
 let chat = new Components.CardPanel();
 chat.HeaderText = "チャット";
-chat.ContentText = "チャットとか";
 chat.Generate($("#chat"), "chat");
 let playerListBox = new Components.CardPanel();
 playerListBox.HeaderText = "プレイヤーリスト";
@@ -51,3 +50,8 @@ setTimeout(() => {
 setTimeout(() => {
     playerList.CurrentPlayer = new Components.Player("aaa", "hissa");
 }, 2000);
+let chatLog = new Components.ChatLog(10);
+chatLog.Generate($("#cardpanelContentchat"), "chatlog");
+for (let i = 0; i < 15; i++) {
+    chatLog.addMessage(new Components.ChatMessage("hissa", i.toString()));
+}

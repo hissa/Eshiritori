@@ -354,9 +354,13 @@ var Components;
     Components.Player = Player;
     var ChatLog = (function (_super) {
         __extends(ChatLog, _super);
-        function ChatLog() {
+        function ChatLog(maxDisplay) {
+            if (maxDisplay === void 0) { maxDisplay = 10; }
             _super.call(this);
             this.isGenerated = false;
+            this.messages = [];
+            this.object = null;
+            this.maxDisplayNumber = maxDisplay;
         }
         Object.defineProperty(ChatLog.prototype, "IsGenerated", {
             get: function () {
@@ -366,6 +370,26 @@ var Components;
             configurable: true
         });
         ChatLog.prototype.Generate = function (parent, idName) {
+            this.unique = idName != undefined ? idName : UniqueIdGenerater.Get().toString();
+            parent.append("<div id=\"chatlog" + this.unique + "\" />");
+            this.object = $("#chatlog" + this.unique);
+            this.isGenerated = true;
+        };
+        ChatLog.prototype.addMessage = function (message) {
+            this.messages.push(message);
+            this.reload();
+        };
+        ChatLog.prototype.reload = function () {
+            if (!this.IsGenerated)
+                return;
+            this.object.empty();
+            var start = this.messages.length - this.maxDisplayNumber;
+            if (start < 0)
+                start = 0;
+            var end = this.messages.length - 1;
+            for (var i = start; i <= end; i++) {
+                this.object.append("<p>" + this.messages[i].Sender + ": " + this.messages[i].Message + "</p>");
+            }
         };
         return ChatLog;
     }(Component));
