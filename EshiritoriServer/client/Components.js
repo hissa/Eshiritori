@@ -352,8 +352,15 @@ var Components;
         return Player;
     }());
     Components.Player = Player;
+    /**
+     * チャットログを表示する枠のクラス
+     */
     var ChatLog = (function (_super) {
         __extends(ChatLog, _super);
+        /**
+         * コンストラクタ
+         * @param maxDisplay メッセージの最大表示数
+         */
         function ChatLog(maxDisplay) {
             if (maxDisplay === void 0) { maxDisplay = 10; }
             _super.call(this);
@@ -369,12 +376,21 @@ var Components;
             enumerable: true,
             configurable: true
         });
+        /**
+         * 指定された親要素にコンポーネントを追加
+         * @param parent 追加する親要素
+         * @param idName 一意なidに使われる文字列を指定できます。（省略可）
+         */
         ChatLog.prototype.Generate = function (parent, idName) {
             this.unique = idName != undefined ? idName : UniqueIdGenerater.Get().toString();
             parent.append("<div id=\"chatlog" + this.unique + "\" />");
             this.object = $("#chatlog" + this.unique);
             this.isGenerated = true;
         };
+        /**
+         * メッセージを追加します。
+         * @param message 追加するメッセージ
+         */
         ChatLog.prototype.addMessage = function (message) {
             this.messages.push(message);
             this.reload();
@@ -424,5 +440,57 @@ var Components;
         return ChatMessage;
     }());
     Components.ChatMessage = ChatMessage;
+    /**
+     * チャットの入力欄のクラス
+     */
+    var ChatInput = (function (_super) {
+        __extends(ChatInput, _super);
+        function ChatInput() {
+            _super.apply(this, arguments);
+            this.isGenerated = false;
+            this.sendMessageEvent = function () { };
+            this.object = null;
+            this.unique = null;
+        }
+        Object.defineProperty(ChatInput.prototype, "IsGenerated", {
+            get: function () {
+                return this.isGenerated;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(ChatInput.prototype, "SendMessageEvent", {
+            set: function (func) {
+                this.sendMessageEvent = func;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        /**
+         * 指定された親要素にコンポーネントを追加
+         * @param parent 追加する親要素
+         * @param idName 一意なidに使われる文字列を指定できます。（省略可）
+         */
+        ChatInput.prototype.Generate = function (parent, idName) {
+            var _this = this;
+            this.unique = idName != undefined ? idName : UniqueIdGenerater.Get().toString();
+            parent.append("<input id=\"chatinput" + this.unique + "\" />");
+            this.object = $("#chatinput" + this.unique);
+            this.object.attr({ "type": "text" });
+            this.object.addClass("form-control");
+            this.object.on("keydown", function (e) {
+                // keyCode13: Enter
+                if (e.keyCode == 13)
+                    _this.send();
+            });
+            this.isGenerated = true;
+        };
+        ChatInput.prototype.send = function () {
+            this.sendMessageEvent(this.object.val());
+            this.object.val("");
+        };
+        return ChatInput;
+    }(Component));
+    Components.ChatInput = ChatInput;
 })(Components || (Components = {}));
 //# sourceMappingURL=Components.js.map

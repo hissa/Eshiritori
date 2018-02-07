@@ -305,6 +305,9 @@ namespace Components {
         }
     }
 
+    /**
+     * チャットログを表示する枠のクラス
+     */
     export class ChatLog extends Component {
         private isGenerated = false;
         private messages: ChatMessage[] = [];
@@ -316,11 +319,20 @@ namespace Components {
             return this.isGenerated;
         }
 
+        /**
+         * コンストラクタ
+         * @param maxDisplay メッセージの最大表示数
+         */
         constructor(maxDisplay = 10) {
             super();
             this.maxDisplayNumber = maxDisplay;
         }
 
+        /**
+         * 指定された親要素にコンポーネントを追加
+         * @param parent 追加する親要素
+         * @param idName 一意なidに使われる文字列を指定できます。（省略可）
+         */
         public Generate(parent: JQuery, idName?: string) {
             this.unique = idName != undefined ? idName : UniqueIdGenerater.Get().toString();
             parent.append(`<div id="chatlog${this.unique}" />`);
@@ -328,6 +340,10 @@ namespace Components {
             this.isGenerated = true;
         }
 
+        /**
+         * メッセージを追加します。
+         * @param message 追加するメッセージ
+         */
         public addMessage(message: ChatMessage) {
             this.messages.push(message);
             this.reload();
@@ -368,6 +384,47 @@ namespace Components {
         constructor(sender: string, message: string) {
             this.sender = sender;
             this.message = message;
+        }
+    }
+
+    /**
+     * チャットの入力欄のクラス
+     */
+    export class ChatInput extends Component {
+        private isGenerated = false;
+        private sendMessageEvent: (message: string) => void = () => { };
+        private object: JQuery = null;
+        private unique: string = null;
+
+        get IsGenerated(): boolean {
+            return this.isGenerated;
+        }
+
+        set SendMessageEvent(func: (message: string) => void) {
+            this.sendMessageEvent = func;
+        }
+
+        /**
+         * 指定された親要素にコンポーネントを追加
+         * @param parent 追加する親要素
+         * @param idName 一意なidに使われる文字列を指定できます。（省略可）
+         */
+        public Generate(parent: JQuery, idName?: string) {
+            this.unique = idName != undefined ? idName : UniqueIdGenerater.Get().toString();
+            parent.append(`<input id="chatinput${this.unique}" />`);
+            this.object = $(`#chatinput${this.unique}`);
+            this.object.attr({ "type": "text" });
+            this.object.addClass("form-control");
+            this.object.on("keydown", (e) => {
+                // keyCode13: Enter
+                if (e.keyCode == 13) this.send();
+            });
+            this.isGenerated = true;
+        }
+
+        private send() {
+            this.sendMessageEvent(this.object.val());
+            this.object.val("");
         }
     }
 }

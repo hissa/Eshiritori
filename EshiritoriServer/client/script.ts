@@ -55,3 +55,6 @@ chatLog.Generate($("#cardpanelContentchat"), "chatlog");
 for (let i = 0; i < 15; i++) {
     chatLog.addMessage(new Components.ChatMessage("hissa", i.toString()));
 }
+let chatinput = new Components.ChatInput();
+chatinput.Generate($("#cardpanelContentchat"), "chatinput");
+chatinput.SendMessageEvent = msg => console.log(msg);
