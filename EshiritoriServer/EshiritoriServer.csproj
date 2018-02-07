@@ -23,6 +23,7 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="app.ts" />
+    <TypeScriptCompile Include="client\Components.ts" />
     <TypeScriptCompile Include="client\Connection.ts" />
     <TypeScriptCompile Include="client\MyCanvas.ts">
       <SubType>Code</SubType>
@@ -30,6 +31,7 @@
     <TypeScriptCompile Include="client\script.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
+    <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\node\node.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\socket.io\socket.io.d.ts" />
   </ItemGroup>

@@ -20,3 +20,8 @@ connection.setEventListener(SocketEvent.LineDrawed, data => {
     if (data.player.id == connection.Id) return;
     canvas.DrawByData(data.data);
 });
+
+let toolbox = new Components.CardPanel();
+toolbox.HeaderText = "パレット";
+toolbox.ContentText = "テスト";
+toolbox.Generate($("#toolBox"), "palet");

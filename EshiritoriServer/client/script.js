@@ -21,4 +21,8 @@ connection.setEventListener(SocketEvent.LineDrawed, function (data) {
         return;
     canvas.DrawByData(data.data);
 });
+var toolbox = new Components.CardPanel();
+toolbox.HeaderText = "パレット";
+toolbox.ContentText = "テスト";
+toolbox.Generate($("#toolBox"), "palet");
 //# sourceMappingURL=script.js.map
