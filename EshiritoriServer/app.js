@@ -1,7 +1,9 @@
+"use strict";
 var fs = require("fs");
 var http = require("http");
 var socketio = require("socket.io");
 var app = require("express")();
+var Rooms = require("./Room");
 // Create Server
 var server = http.Server(app);
 server.listen(11451, function () {
@@ -9,15 +11,16 @@ server.listen(11451, function () {
 });
 // Routing
 app.get("/:file", function (req, res) {
-    if (req.params.file == "/") {
-        res.sendFile(__dirname + "/client/index.html");
-        return;
-    }
     res.sendFile(__dirname + "/client/" + req.params.file);
+});
+app.get("/", function (req, res) {
+    // "/"の場合はトップページ
+    res.sendFile(__dirname + "/client/rooms.html");
 });
 // Use Socket.IO
 var io = socketio.listen(server);
 var users = {};
+var rooms = [];
 io.sockets.on("connection", function (socket) {
     // Define Events
     // プレイヤーが接続
@@ -44,17 +47,20 @@ io.sockets.on("connection", function (socket) {
     });
     // プレイヤーが切断
     socket.on("disconnect", function () {
-        if (users[socket.id]) {
-            var name_1 = users[socket.id];
-            delete users[socket.id];
-            io.sockets.emit("PlayerDisconnected", {
-                player: {
-                    name: name_1,
-                    id: socket.id
-                }
-            });
-            console.log("Disconnected: " + name_1);
-        }
+        //if (users[socket.id]) {
+        //    let name = users[socket.id];
+        //    delete users[socket.id];
+        //    io.sockets.emit("PlayerDisconnected", {
+        //        player: {
+        //            name: name,
+        //            id: socket.id
+        //        }
+        //    });
+        //    console.log(`Disconnected: ${name}`);
+        //}
+        var room = io.sockets.manager.roomClients[socket.id];
+        socket.leave(room);
+        rooms[room].RemovePlayer(socket.id);
     });
     // 線の情報が到着
     socket.on("Drawing", function (data) {
@@ -65,6 +71,21 @@ io.sockets.on("connection", function (socket) {
             },
             data: data
         });
+    });
+    // 部屋の情報の問い合わせ
+    socket.on("GetRooms", function (data) {
+        var ret = [];
+        rooms.forEach(function (value) { return ret.push(value.ToHash()); });
+        io.to(socket.id).emit("GetRoomsResponse", ret);
+    });
+    // 部屋を作成
+    socket.on("NewRoom", function (data) {
+        rooms[socket.id] = new Rooms.Room(socket.id, data.value.name);
+    });
+    // 部屋に接続
+    socket.on("ConnectToRoom", function (data) {
+        rooms[data.id].AddPlayer(new Rooms.Player(data.value.player.id, data.value.player.name));
+        socket.join(rooms[data.id].RoomId);
     });
 });
 //# sourceMappingURL=app.js.map

@@ -29,6 +29,7 @@ var Connections;
         SocketEvent[SocketEvent["PlayerDisconnected"] = 1] = "PlayerDisconnected";
         SocketEvent[SocketEvent["MessagePublished"] = 2] = "MessagePublished";
         SocketEvent[SocketEvent["LineDrawed"] = 3] = "LineDrawed";
+        SocketEvent[SocketEvent["GetRoomsResponse"] = 4] = "GetRoomsResponse";
     })(Connections.SocketEvent || (Connections.SocketEvent = {}));
     var SocketEvent = Connections.SocketEvent;
     ;
@@ -63,8 +64,19 @@ var Connections;
         Connection.prototype.publishMessage = function (message) {
             this.socketio.emit("Publish", { value: message });
         };
+        /**
+         * 線の情報を送信します。
+         * @param data 線のデータ
+         */
         Connection.prototype.draw = function (data) {
             this.socketio.emit("Drawing", data);
+        };
+        /**
+         * 部屋一覧を取得します。
+         * レスポンスはGetRoomsResponseイベントが発火されます。
+         */
+        Connection.prototype.getRooms = function () {
+            this.socketio.emit("GetRooms", {});
         };
         /**
          * Socket.IOのイベントに対してイベントリスナーをセットします。
@@ -80,6 +92,7 @@ var Connections;
             this.socketio.on(SocketEvent[SocketEvent.PlayerConnected], function () { });
             this.socketio.on(SocketEvent[SocketEvent.PlayerDisconnected], function () { });
             this.socketio.on(SocketEvent[SocketEvent.LineDrawed], function () { });
+            this.socketio.on(SocketEvent[SocketEvent.GetRoomsResponse], function () { });
         };
         return Connection;
     }());

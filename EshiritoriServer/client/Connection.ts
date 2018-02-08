@@ -25,7 +25,8 @@
         PlayerConnected,
         PlayerDisconnected,
         MessagePublished,
-        LineDrawed
+        LineDrawed,
+        GetRoomsResponse
     };
 
     export class Connection {
@@ -62,8 +63,20 @@
             this.socketio.emit("Publish", { value: message });
         }
 
+        /**
+         * 線の情報を送信します。
+         * @param data 線のデータ
+         */
         public draw(data: any) {
             this.socketio.emit("Drawing", data);
+        }
+
+        /**
+         * 部屋一覧を取得します。
+         * レスポンスはGetRoomsResponseイベントが発火されます。
+         */
+        public getRooms() {
+            this.socketio.emit("GetRooms", {});
         }
 
         /**
@@ -81,6 +94,7 @@
             this.socketio.on(SocketEvent[SocketEvent.PlayerConnected], () => { });
             this.socketio.on(SocketEvent[SocketEvent.PlayerDisconnected], () => { });
             this.socketio.on(SocketEvent[SocketEvent.LineDrawed], () => { });
+            this.socketio.on(SocketEvent[SocketEvent.GetRoomsResponse], () => { });
         }
     }
 }
