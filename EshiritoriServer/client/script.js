@@ -23,7 +23,6 @@ connection.setEventListener(SocketEvent.LineDrawed, function (data) {
 });
 var toolbox = new Components.CardPanel();
 toolbox.HeaderText = "パレット";
-toolbox.ContentText = "テスト";
 toolbox.Generate($("#toolBox"), "palet");
 var chat = new Components.CardPanel();
 chat.HeaderText = "チャット";
@@ -53,9 +52,15 @@ setTimeout(function () {
 var chatLog = new Components.ChatLog(10);
 chatLog.Generate($("#cardpanelContentchat"), "chatlog");
 for (var i = 0; i < 15; i++) {
-    chatLog.addMessage(new Components.ChatMessage("hissa", i.toString()));
+    chatLog.addMessage(new Components.ChatMessage("hissa", "hello" + i.toString()));
 }
 var chatinput = new Components.ChatInput();
 chatinput.Generate($("#cardpanelContentchat"), "chatinput");
 chatinput.SendMessageEvent = function (msg) { return console.log(msg); };
+var colorBox = new Components.ColorBox(100, 30, "red");
+colorBox.Generate($("#cardpanelContentpalet"));
+colorBox.ClickedEvent = function (e) { return console.log("clicked"); };
+var penSizeSelector = new Components.PenSizeSelector([1, 5, 10, 20]);
+penSizeSelector.Generate($("#cardpanelContentpalet"));
+penSizeSelector.SelectedEvent = function (value) { return console.log(value); };
 //# sourceMappingURL=script.js.map

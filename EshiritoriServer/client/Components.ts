@@ -427,4 +427,132 @@ namespace Components {
             this.object.val("");
         }
     }
+
+    /**
+     * 色を表示するCanvasのクラス
+     */
+    export class ColorBox extends Component {
+        private isGenerated = false;
+        private colorName: string = null;
+        private unique: string = null;
+        private object: JQuery = null;
+        private canvas: HTMLCanvasElement = null;
+        private ctx: CanvasRenderingContext2D = null;
+        private height: number = null;
+        private width: number = null;
+        private clickedEvent: (e: JQueryMouseEventObject) => void = () => { };
+
+        get ColorName(): string {
+            return this.colorName;
+        }
+        set ColorName(value: string) {
+            this.colorName = value;
+        }
+
+        get IsGenerated(): boolean {
+            return this.isGenerated;
+        }
+
+        get Height(): number {
+            return this.height;
+        }
+
+        get Width(): number {
+            return this.width;
+        }
+
+        set ClickedEvent(func: (e: JQueryMouseEventObject) => void) {
+            this.clickedEvent = func;
+        }
+
+        /**
+         * コンストラクタ  
+         * @param width 幅
+         * @param height 高さ
+         * @param colorName 色の名前
+         */
+        constructor(width: number, height: number, colorName = "black") {
+            super();
+            this.width = width;
+            this.height = height;
+            this.ColorName = colorName;
+        }
+
+        /**
+         * 指定された親要素にコンポーネントを追加
+         * @param parent 追加する親要素
+         * @param idName 一意なidに使われる文字列を指定できます。（省略可）
+         */
+        public Generate(parent: JQuery, idName?: string) {
+            this.unique = idName != undefined ? idName : UniqueIdGenerater.Get().toString();
+            parent.append(`<canvas id="colorbox${this.unique}" />`);
+            this.object = $(`#colorbox${this.unique}`);
+            this.object.attr({
+                "width": this.width,
+                "height": this.height
+            });
+            this.canvas = <HTMLCanvasElement>document.getElementById(`colorbox${this.unique}`);
+            this.ctx = this.canvas.getContext("2d");
+            this.object.on("click", e => this.clickedEvent(e));
+            this.isGenerated = true;
+            this.reload();
+        }
+
+        private reload() {
+            if (!this.IsGenerated) return;
+            this.clear();
+            this.ctx.fillStyle = this.ColorName;
+            this.ctx.fillRect(0, 0, this.Width, this.Height);
+        }
+
+        private clear() {
+            this.ctx.clearRect(0, 0, this.Width, this.Height);
+        }
+    }
+
+    export class PenSizeSelector extends Component {
+        private isGenerated = false;
+        private sizes: number[] = [];
+        private unique: string = null;
+        private object: JQuery = null;
+        private selectedEvent: (value: number) => void = () => { };
+
+        get IsGenerated(): boolean {
+            return this.isGenerated;
+        }
+
+        get Sizez(): number[] {
+            return this.sizes;
+        }
+
+        set SelectedEvent(func: (value: number) => void) {
+            this.selectedEvent = func;
+        }
+
+        /**
+         * コンストラクタ
+         * @param sizes ペンの太さの配列
+         */
+        constructor(sizes: number[]) {
+            super();
+            this.sizes = sizes;
+        }
+
+        /**
+         * 指定された親要素にコンポーネントを追加
+         * @param parent 追加する親要素
+         * @param idName 一意なidに使われる文字列を指定できます。（省略可）
+         */
+        public Generate(parent: JQuery, idName?: string) {
+            this.unique = idName != undefined ? idName : UniqueIdGenerater.Get().toString();
+            parent.append(`<select id="pensizeselector${this.unique}" />`);
+            this.object = $(`#pensizeselector${this.unique}`);
+            this.object.addClass("custom-select");
+            this.Sizez.forEach((value, index) => {
+                this.object.append(`<option value="${index}">${value}</option>`);
+            });
+            this.object.on("change", e => this.selectedEvent(this.Sizez[this.object.val()]));
+            this.isGenerated = true;
+        }
+    }
 }

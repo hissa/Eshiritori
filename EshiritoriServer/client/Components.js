@@ -492,5 +492,159 @@ var Components;
         return ChatInput;
     }(Component));
     Components.ChatInput = ChatInput;
+    /**
+     * 色を表示するCanvasのクラス
+     */
+    var ColorBox = (function (_super) {
+        __extends(ColorBox, _super);
+        /**
+         * コンストラクタ
+         * @param width 幅
+         * @param height 高さ
+         * @param colorName 色の名前
+         */
+        function ColorBox(width, height, colorName) {
+            if (colorName === void 0) { colorName = "black"; }
+            _super.call(this);
+            this.isGenerated = false;
+            this.colorName = null;
+            this.unique = null;
+            this.object = null;
+            this.canvas = null;
+            this.ctx = null;
+            this.height = null;
+            this.width = null;
+            this.clickedEvent = function () { };
+            this.width = width;
+            this.height = height;
+            this.ColorName = colorName;
+        }
+        Object.defineProperty(ColorBox.prototype, "ColorName", {
+            get: function () {
+                return this.colorName;
+            },
+            set: function (value) {
+                this.colorName = value;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(ColorBox.prototype, "IsGenerated", {
+            get: function () {
+                return this.isGenerated;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(ColorBox.prototype, "Height", {
+            get: function () {
+                return this.height;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(ColorBox.prototype, "Width", {
+            get: function () {
+                return this.width;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(ColorBox.prototype, "ClickedEvent", {
+            set: function (func) {
+                this.clickedEvent = func;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        /**
+         * 指定された親要素にコンポーネントを追加
+         * @param parent 追加する親要素
+         * @param idName 一意なidに使われる文字列を指定できます。（省略可）
+         */
+        ColorBox.prototype.Generate = function (parent, idName) {
+            var _this = this;
+            this.unique = idName != undefined ? idName : UniqueIdGenerater.Get().toString();
+            parent.append("<canvas id=\"colorbox" + this.unique + "\" />");
+            this.object = $("#colorbox" + this.unique);
+            this.object.attr({
+                "width": this.width,
+                "height": this.height
+            });
+            this.canvas = document.getElementById("colorbox" + this.unique);
+            this.ctx = this.canvas.getContext("2d");
+            this.object.on("click", function (e) { return _this.clickedEvent(e); });
+            this.isGenerated = true;
+            this.reload();
+        };
+        ColorBox.prototype.reload = function () {
+            if (!this.IsGenerated)
+                return;
+            this.clear();
+            this.ctx.fillStyle = this.ColorName;
+            this.ctx.fillRect(0, 0, this.Width, this.Height);
+        };
+        ColorBox.prototype.clear = function () {
+            this.ctx.clearRect(0, 0, this.Width, this.Height);
+        };
+        return ColorBox;
+    }(Component));
+    Components.ColorBox = ColorBox;
+    var PenSizeSelector = (function (_super) {
+        __extends(PenSizeSelector, _super);
+        /**
+         * コンストラクタ
+         * @param sizes ペンの太さの配列
+         */
+        function PenSizeSelector(sizes) {
+            _super.call(this);
+            this.isGenerated = false;
+            this.sizes = [];
+            this.unique = null;
+            this.object = null;
+            this.selectedEvent = function () { };
+            this.sizes = sizes;
+        }
+        Object.defineProperty(PenSizeSelector.prototype, "IsGenerated", {
+            get: function () {
+                return this.isGenerated;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(PenSizeSelector.prototype, "Sizez", {
+            get: function () {
+                return this.sizes;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(PenSizeSelector.prototype, "SelectedEvent", {
+            set: function (func) {
+                this.selectedEvent = func;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        /**
+         * 指定された親要素にコンポーネントを追加
+         * @param parent 追加する親要素
+         * @param idName 一意なidに使われる文字列を指定できます。（省略可）
+         */
+        PenSizeSelector.prototype.Generate = function (parent, idName) {
+            var _this = this;
+            this.unique = idName != undefined ? idName : UniqueIdGenerater.Get().toString();
+            parent.append("<select id=\"pensizeselector" + this.unique + "\" />");
+            this.object = $("#pensizeselector" + this.unique);
+            this.object.addClass("custom-select");
+            this.Sizez.forEach(function (value, index) {
+                _this.object.append("<option value=\"" + index + "\">" + value + "</option>");
+            });
+            this.object.on("change", function (e) { return _this.selectedEvent(_this.Sizez[_this.object.val()]); });
+            this.isGenerated = true;
+        };
+        return PenSizeSelector;
+    }(Component));
+    Components.PenSizeSelector = PenSizeSelector;
 })(Components || (Components = {}));
 //# sourceMappingURL=Components.js.map

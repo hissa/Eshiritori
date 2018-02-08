@@ -23,7 +23,6 @@ connection.setEventListener(SocketEvent.LineDrawed, data => {
 
 let toolbox = new Components.CardPanel();
 toolbox.HeaderText = "パレット";
-toolbox.ContentText = "テスト";
 toolbox.Generate($("#toolBox"), "palet");
 let chat = new Components.CardPanel();
 chat.HeaderText = "チャット";
@@ -53,8 +52,14 @@ setTimeout(() => {
 let chatLog = new Components.ChatLog(10);
 chatLog.Generate($("#cardpanelContentchat"), "chatlog");
 for (let i = 0; i < 15; i++) {
-    chatLog.addMessage(new Components.ChatMessage("hissa", i.toString()));
+    chatLog.addMessage(new Components.ChatMessage("hissa", "hello" + i.toString()));
 }
 let chatinput = new Components.ChatInput();
 chatinput.Generate($("#cardpanelContentchat"), "chatinput");
 chatinput.SendMessageEvent = msg => console.log(msg);
+let colorBox = new Components.ColorBox(100, 30, "red");
+colorBox.Generate($("#cardpanelContentpalet"));
+colorBox.ClickedEvent = e => console.log("clicked");
+let penSizeSelector = new Components.PenSizeSelector([1, 5, 10, 20]);
+penSizeSelector.Generate($("#cardpanelContentpalet"));
+penSizeSelector.SelectedEvent = value => console.log(value);
