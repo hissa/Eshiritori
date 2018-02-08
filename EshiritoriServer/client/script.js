@@ -61,6 +61,8 @@ var colorBox = new Components.ColorBox(100, 30, "red");
 colorBox.Generate($("#cardpanelContentpalet"));
 colorBox.ClickedEvent = function (e) { return console.log("clicked"); };
 var penSizeSelector = new Components.PenSizeSelector([1, 5, 10, 20]);
+var penSizeSample = new Components.PenSizeSample(100, 100);
 penSizeSelector.Generate($("#cardpanelContentpalet"));
-penSizeSelector.SelectedEvent = function (value) { return console.log(value); };
+penSizeSample.Generate($("#cardpanelContentpalet"));
+penSizeSelector.SelectedEvent = function (value) { return penSizeSample.PenSize = value; };
 //# sourceMappingURL=script.js.map

@@ -510,6 +510,9 @@ namespace Components {
         }
     }
 
+    /**
+     * ペンのサイズを選択するSelectBox
+     */
     export class PenSizeSelector extends Component {
         private isGenerated = false;
         private sizes: number[] = [];
@@ -553,6 +556,97 @@ namespace Components {
             });
             this.object.on("change", e => this.selectedEvent(this.Sizez[this.object.val()]));
             this.isGenerated = true;
+        }
+    }
+
+    /**
+     * ペンのサイズのサンプルを表示するCanvas
+     */
+    export class PenSizeSample extends Component {
+        private isGenerated = false;
+        private unique: string = null;
+        private object: JQuery = null;
+        private canvas: HTMLCanvasElement = null;
+        private ctx: CanvasRenderingContext2D = null;
+        private penSize: number = null;
+        private width: number = null;
+        private height: number = null;
+
+        get IsGenerated(): boolean {
+            return this.isGenerated;
+        }
+
+        get PenSize(): number {
+            return this.penSize;
+        }
+        set PenSize(value: number) {
+            this.penSize = value;
+            this.reload();
+        }
+
+        get Width(): number {
+            return this.width;
+        }
+
+        get Height(): number {
+            return this.height;
+        }
+
+        get CenterX(): number {
+            return this.Width / 2;
+        }
+
+        get CenterY(): number {
+            return this.Height / 2;
+        }
+
+        /**
+         * コンストラクタ
+         * @param width 幅
+         * @param height 高さ
+         * @param defaultSize サイズの初期値
+         */
+        constructor(width: number, height: number, defaultSize = 10) {
+            super();
+            this.width = width;
+            this.height = height;
+            this.PenSize = defaultSize;
+        }
+
+        /**
+         * 指定された親要素にコンポーネントを追加
+         * @param parent 追加する親要素
+         * @param idName 一意なidに使われる文字列を指定できます。（省略可）
+         */
+        public Generate(parent: JQuery, idName?: string) {
+            this.unique = idName != undefined ? idName : UniqueIdGenerater.Get().toString();
+            parent.append(`<canvas id="pensizesample${this.unique}" />`);
+            this.object = $(`#pensizesample${this.unique}`);
+            this.object.attr({
+                "width": this.width,
+                "height": this.height
+            });
+            this.canvas = <HTMLCanvasElement>document.getElementById(`pensizesample${this.unique}`);
+            this.ctx = this.canvas.getContext("2d");
+            this.isGenerated = true;
+            this.reload();
+        }
+
+        private reload() {
+            if (!this.IsGenerated) return;
+            this.clear();
+            this.ctx.lineCap = "round";
+            this.ctx.strokeStyle = "black";
+            this.ctx.lineWidth = this.PenSize;
+            this.ctx.beginPath();
+            this.ctx.moveTo(this.CenterX, this.CenterY);
+            this.ctx.lineTo(this.CenterX, this.CenterY);
+            this.ctx.stroke();
+            this.ctx.closePath();
+        }
+
+        private clear() {
+            this.ctx.clearRect(0, 0, this.Width, this.Height);
         }
     }
 }

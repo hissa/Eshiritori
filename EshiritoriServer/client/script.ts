@@ -61,5 +61,7 @@ let colorBox = new Components.ColorBox(100, 30, "red");
 colorBox.Generate($("#cardpanelContentpalet"));
 colorBox.ClickedEvent = e => console.log("clicked");
 let penSizeSelector = new Components.PenSizeSelector([1, 5, 10, 20]);
+let penSizeSample = new Components.PenSizeSample(100, 100);
 penSizeSelector.Generate($("#cardpanelContentpalet"));
-penSizeSelector.SelectedEvent = value => console.log(value);
+penSizeSample.Generate($("#cardpanelContentpalet"));
+penSizeSelector.SelectedEvent = value => penSizeSample.PenSize = value;

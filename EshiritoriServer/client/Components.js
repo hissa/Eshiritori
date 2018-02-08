@@ -590,6 +590,9 @@ var Components;
         return ColorBox;
     }(Component));
     Components.ColorBox = ColorBox;
+    /**
+     * ペンのサイズを選択するSelectBox
+     */
     var PenSizeSelector = (function (_super) {
         __extends(PenSizeSelector, _super);
         /**
@@ -646,5 +649,114 @@ var Components;
         return PenSizeSelector;
     }(Component));
     Components.PenSizeSelector = PenSizeSelector;
+    /**
+     * ペンのサイズのサンプルを表示するCanvas
+     */
+    var PenSizeSample = (function (_super) {
+        __extends(PenSizeSample, _super);
+        /**
+         * コンストラクタ
+         * @param width 幅
+         * @param height 高さ
+         * @param defaultSize サイズの初期値
+         */
+        function PenSizeSample(width, height, defaultSize) {
+            if (defaultSize === void 0) { defaultSize = 10; }
+            _super.call(this);
+            this.isGenerated = false;
+            this.unique = null;
+            this.object = null;
+            this.canvas = null;
+            this.ctx = null;
+            this.penSize = null;
+            this.width = null;
+            this.height = null;
+            this.width = width;
+            this.height = height;
+            this.PenSize = defaultSize;
+        }
+        Object.defineProperty(PenSizeSample.prototype, "IsGenerated", {
+            get: function () {
+                return this.isGenerated;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(PenSizeSample.prototype, "PenSize", {
+            get: function () {
+                return this.penSize;
+            },
+            set: function (value) {
+                this.penSize = value;
+                this.reload();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(PenSizeSample.prototype, "Width", {
+            get: function () {
+                return this.width;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(PenSizeSample.prototype, "Height", {
+            get: function () {
+                return this.height;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(PenSizeSample.prototype, "CenterX", {
+            get: function () {
+                return this.Width / 2;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(PenSizeSample.prototype, "CenterY", {
+            get: function () {
+                return this.Height / 2;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        /**
+         * 指定された親要素にコンポーネントを追加
+         * @param parent 追加する親要素
+         * @param idName 一意なidに使われる文字列を指定できます。（省略可）
+         */
+        PenSizeSample.prototype.Generate = function (parent, idName) {
+            this.unique = idName != undefined ? idName : UniqueIdGenerater.Get().toString();
+            parent.append("<canvas id=\"pensizesample" + this.unique + "\" />");
+            this.object = $("#pensizesample" + this.unique);
+            this.object.attr({
+                "width": this.width,
+                "height": this.height
+            });
+            this.canvas = document.getElementById("pensizesample" + this.unique);
+            this.ctx = this.canvas.getContext("2d");
+            this.isGenerated = true;
+            this.reload();
+        };
+        PenSizeSample.prototype.reload = function () {
+            if (!this.IsGenerated)
+                return;
+            this.clear();
+            this.ctx.lineCap = "round";
+            this.ctx.strokeStyle = "black";
+            this.ctx.lineWidth = this.PenSize;
+            this.ctx.beginPath();
+            this.ctx.moveTo(this.CenterX, this.CenterY);
+            this.ctx.lineTo(this.CenterX, this.CenterY);
+            this.ctx.stroke();
+            this.ctx.closePath();
+        };
+        PenSizeSample.prototype.clear = function () {
+            this.ctx.clearRect(0, 0, this.Width, this.Height);
+        };
+        return PenSizeSample;
+    }(Component));
+    Components.PenSizeSample = PenSizeSample;
 })(Components || (Components = {}));
 //# sourceMappingURL=Components.js.map
