@@ -650,6 +650,9 @@ namespace Components {
         }
     }
 
+    /**
+     * ルームリストのクラス
+     */
     export class RoomList extends Component {
         private isGenerated = false;
         private object: JQuery = null;
@@ -675,6 +678,11 @@ namespace Components {
             this.clickedEnterRoomEvent = func;
         }
 
+        /**
+         * 指定された親要素にコンポーネントを追加
+         * @param parent 追加する親要素
+         * @param idName 一意なidに使われる文字列を指定できます。（省略可）
+         */
         public Generate(parent: JQuery, idName?: string) {
             this.unique = idName != undefined ? idName : UniqueIdGenerater.Get().toString();
             parent.append(`<table id="roomlist${this.unique}" />`);
@@ -730,6 +738,9 @@ namespace Components {
         Default, Disabled, Toggle
     }
 
+    /**
+     * Bootstrap4のボタンのクラス
+     */
     export class Button extends Component {
         private isGenerated = false;
         private object: JQuery = null;
@@ -802,6 +813,11 @@ namespace Components {
             }
         }
 
+        /**
+         * 指定された親要素にコンポーネントを追加
+         * @param parent 追加する親要素
+         * @param idName 一意なidに使われる文字列を指定できます。（省略可）
+         */
         public Generate(parent: JQuery, idName?: string) {
             this.unique = idName != undefined ? idName : UniqueIdGenerater.Get().toString();
             parent.append(`<button id="button${this.unique}" />`);

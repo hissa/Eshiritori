@@ -758,6 +758,9 @@ var Components;
         return PenSizeSample;
     }(Component));
     Components.PenSizeSample = PenSizeSample;
+    /**
+     * ルームリストのクラス
+     */
     var RoomList = (function (_super) {
         __extends(RoomList, _super);
         function RoomList() {
@@ -795,6 +798,11 @@ var Components;
             enumerable: true,
             configurable: true
         });
+        /**
+         * 指定された親要素にコンポーネントを追加
+         * @param parent 追加する親要素
+         * @param idName 一意なidに使われる文字列を指定できます。（省略可）
+         */
         RoomList.prototype.Generate = function (parent, idName) {
             this.unique = idName != undefined ? idName : UniqueIdGenerater.Get().toString();
             parent.append("<table id=\"roomlist" + this.unique + "\" />");
@@ -863,6 +871,9 @@ var Components;
         ButtonStatus[ButtonStatus["Toggle"] = 2] = "Toggle";
     })(Components.ButtonStatus || (Components.ButtonStatus = {}));
     var ButtonStatus = Components.ButtonStatus;
+    /**
+     * Bootstrap4のボタンのクラス
+     */
     var Button = (function (_super) {
         __extends(Button, _super);
         function Button() {
@@ -962,6 +973,11 @@ var Components;
             enumerable: true,
             configurable: true
         });
+        /**
+         * 指定された親要素にコンポーネントを追加
+         * @param parent 追加する親要素
+         * @param idName 一意なidに使われる文字列を指定できます。（省略可）
+         */
         Button.prototype.Generate = function (parent, idName) {
             var _this = this;
             this.unique = idName != undefined ? idName : UniqueIdGenerater.Get().toString();
