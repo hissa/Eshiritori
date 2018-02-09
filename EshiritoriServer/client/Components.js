@@ -1089,5 +1089,224 @@ var Components;
         return Room;
     }());
     Components.Room = Room;
+    (function (TextboxType) {
+        TextboxType[TextboxType["text"] = 0] = "text";
+        TextboxType[TextboxType["email"] = 1] = "email";
+        TextboxType[TextboxType["password"] = 2] = "password";
+    })(Components.TextboxType || (Components.TextboxType = {}));
+    var TextboxType = Components.TextboxType;
+    ;
+    (function (InputStatus) {
+        InputStatus[InputStatus["none"] = 0] = "none";
+        InputStatus[InputStatus["success"] = 1] = "success";
+        InputStatus[InputStatus["warning"] = 2] = "warning";
+        InputStatus[InputStatus["danger"] = 3] = "danger";
+    })(Components.InputStatus || (Components.InputStatus = {}));
+    var InputStatus = Components.InputStatus;
+    ;
+    var Textbox = (function (_super) {
+        __extends(Textbox, _super);
+        function Textbox(type, defaultText, placeholder) {
+            if (type === void 0) { type = TextboxType.text; }
+            if (defaultText === void 0) { defaultText = ""; }
+            if (placeholder === void 0) { placeholder = ""; }
+            _super.call(this);
+            this.isGenerated = false;
+            this.unique = null;
+            this.placeholder = "";
+            this.default = "";
+            this.type = TextboxType.text;
+            this.label = "";
+            this.status = InputStatus.none;
+            this.groupObject = null;
+            this.inputObject = null;
+            this.labelObject = null;
+            this.placeholder = placeholder;
+            this.default = defaultText;
+            this.type = type;
+        }
+        Object.defineProperty(Textbox.prototype, "Label", {
+            get: function () {
+                return this.label;
+            },
+            set: function (value) {
+                this.label = value;
+                this.labelObject.val(this.label);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Textbox.prototype, "Status", {
+            get: function () {
+                return this.status;
+            },
+            set: function (value) {
+                this.status = value;
+                this.reloadStatus();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Textbox.prototype, "Placeholder", {
+            get: function () {
+                return this.placeholder;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Textbox.prototype, "Default", {
+            get: function () {
+                return this.default;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Textbox.prototype, "Type", {
+            get: function () {
+                return this.type;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Textbox.prototype, "IsGenerated", {
+            get: function () {
+                return this.isGenerated;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Textbox.prototype.Generate = function (parent, idName) {
+            this.unique = idName != undefined ? idName : UniqueIdGenerater.Get().toString();
+            parent.append("<div id=\"textbox" + this.unique + "group\" />");
+            this.groupObject = $("#textbox" + this.unique + "group");
+            this.groupObject.append("<label id=\"textbox" + this.unique + "label\" />");
+            this.labelObject = $("#textbox" + this.unique + "label");
+            this.groupObject.append("<input id=\"textbox" + this.unique + "input\" />");
+            this.inputObject = $("$textbox" + this.unique + "input");
+            this.groupObject.addClass("form-group");
+            this.labelObject.attr({ "for": "textbox" + this.unique + "input" });
+            this.labelObject.text(this.label);
+            this.inputObject.addClass("form-control");
+            this.inputObject.attr({ "type": TextboxType[this.type] });
+            this.inputObject.attr({ "placeholder": this.placeholder });
+            this.inputObject.val(this.default);
+            this.isGenerated = true;
+            this.reloadStatus();
+        };
+        Textbox.prototype.reloadStatus = function () {
+            if (!this.IsGenerated)
+                return;
+            this.groupObject.removeClass("has-success has-warning has-danger");
+            if (this.Status == InputStatus.none)
+                return;
+            this.groupObject.addClass("has-" + InputStatus[this.Status]);
+        };
+        return Textbox;
+    }(Component));
+    Components.Textbox = Textbox;
+    var Modal = (function (_super) {
+        __extends(Modal, _super);
+        function Modal() {
+            _super.apply(this, arguments);
+            this.isGenerated = false;
+            this.unique = null;
+            this.title = "";
+            this.content = "";
+            this.footer = "";
+            this.object = null;
+            this.dialogObject = null;
+            this.contentObject = null;
+            this.headerObject = null;
+            this.bodyObject = null;
+            this.footerObject = null;
+        }
+        Object.defineProperty(Modal.prototype, "Title", {
+            get: function () {
+                return this.title;
+            },
+            set: function (value) {
+                this.title = value;
+                this.reload();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Modal.prototype, "Content", {
+            get: function () {
+                return this.content;
+            },
+            set: function (value) {
+                this.content = value;
+                this.reload();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Modal.prototype, "Footer", {
+            get: function () {
+                return this.footer;
+            },
+            set: function (value) {
+                this.footer = value;
+                this.reload();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Modal.prototype, "IsGenerated", {
+            get: function () {
+                return this.isGenerated;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Modal.prototype.Generate = function (parent, idName) {
+            this.unique = idName != undefined ? idName : UniqueIdGenerater.Get().toString();
+            parent.append("<div id=\"modal" + this.unique + "\" />");
+            this.object = $("#modal" + this.unique);
+            this.object.append("<div id=\"modal" + this.unique + "dialog\" />");
+            this.dialogObject = $("#modal" + this.unique + "dialog");
+            this.dialogObject.append("<div id=\"modal" + this.unique + "content\" />");
+            this.contentObject = $("#modal" + this.unique + "content");
+            this.contentObject.append("<div id=\"modal" + this.unique + "head\" />");
+            this.contentObject.append("<div id=\"modal" + this.unique + "body\" />");
+            this.contentObject.append("<div id=\"modal" + this.unique + "foot\" />");
+            this.headerObject = $("#modal" + this.unique + "head");
+            this.bodyObject = $("#modal" + this.unique + "body");
+            this.footerObject = $("#modal" + this.unique + "foot");
+            this.object.addClass("modal fade");
+            this.object.attr({
+                "tabindex": "-1",
+                "role": "dialog",
+                "aria-hidden": "true"
+            });
+            this.dialogObject.addClass("modal-dialog");
+            this.dialogObject.attr({ "role": "document" });
+            this.contentObject.addClass("modal-content");
+            this.headerObject.addClass("modal-header");
+            this.bodyObject.addClass("modal-body");
+            this.footerObject.addClass("modal-footer");
+            this.isGenerated = true;
+            this.reload();
+        };
+        Modal.prototype.Show = function () {
+            this.object.modal("show");
+        };
+        Modal.prototype.Hide = function () {
+            this.object.modal("hide");
+        };
+        Modal.prototype.reload = function () {
+            if (!this.IsGenerated)
+                return;
+            this.headerObject.empty();
+            this.headerObject.text(this.title);
+            this.headerObject.append("<button class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\">" +
+                "<span aria-hidden=\"true\">&times;</span></button>");
+            this.bodyObject.text(this.content);
+            this.footerObject.text(this.footer);
+        };
+        return Modal;
+    }(Component));
+    Components.Modal = Modal;
 })(Components || (Components = {}));
 //# sourceMappingURL=Components.js.map

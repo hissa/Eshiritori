@@ -129,6 +129,12 @@ var Connections;
         Connection2.prototype.GetRooms = function (callback) {
             this.socket.emit("GetRooms", {}, function (data) { return callback(data); });
         };
+        Connection2.prototype.VerifyPassword = function (roomId, inputPassword, callback) {
+            this.socket.emit("VerifyPassword", {
+                inputPassword: inputPassword,
+                roomId: roomId
+            }, function (data) { return callback(data.success); });
+        };
         return Connection2;
     }());
     Connections.Connection2 = Connection2;

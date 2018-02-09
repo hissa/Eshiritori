@@ -19,34 +19,17 @@ function show() {
 
 let rooms: Components.Room[] = [];
 let rconnection = new Connections.Connection2();
-rconnection.EnterToNewRoom("testroom", "hissa", () => {
-    rconnection.GetRooms(data => {
-        data.forEach(value => {
-            let members: Components.Player[] = [];
-            console.log(value);
-            value.members.forEach(player => {
-                members.push(new Components.Player(player.id, player.name));
-            });
-            rooms.push(new Components.Room(
-                value.name,
-                members,
-                value.hasPassword
-            ));
+rconnection.GetRooms(data => {
+    data.forEach(value => {
+        let members: Components.Player[] = [];
+        value.members.forEach(player => {
+            members.push(new Components.Player(player.id, player.name));
         });
-        show();
+        rooms.push(new Components.Room(
+            value.name,
+            members,
+            value.hasPassword
+        ));
     });
+    show();
 });
-//rconnection.GetRooms(data => {
-//    data.forEach(value => {
-//        let members: Components.Player[] = [];
-//        value.members.forEach(player => {
-//            members.push(new Components.Player(player.id, player.name));
-//        });
-//        rooms.push(new Components.Room(
-//            value.name,
-//            members,
-//            value.hasPassword
-//        ));
-//    });
-//    show();
-//});

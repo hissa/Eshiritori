@@ -918,4 +918,187 @@ namespace Components {
             this.hasPassword = hasPassword;
         }
     }
+
+    export enum TextboxType {
+        text,
+        email,
+        password
+    };
+
+    export enum InputStatus {
+        none,
+        success,
+        warning,
+        danger
+    };
+
+    export class Textbox extends Component {
+        private isGenerated = false;
+        private unique: string = null;
+        private placeholder: string = "";
+        private default: string = "";
+        private type: TextboxType = TextboxType.text;
+        private label: string = "";
+        private status: InputStatus = InputStatus.none;
+        private groupObject: JQuery = null;
+        private inputObject: JQuery = null;
+        private labelObject: JQuery = null;
+
+        get Label(): string {
+            return this.label;
+        }
+        set Label(value: string) {
+            this.label = value;
+            this.labelObject.val(this.label);
+        }
+
+        get Status(): InputStatus {
+            return this.status;
+        }
+        set Status(value: InputStatus) {
+            this.status = value;
+            this.reloadStatus();
+        }
+
+        get Placeholder(): string {
+            return this.placeholder;
+        }
+
+        get Default(): string {
+            return this.default;
+        }
+
+        get Type(): TextboxType {
+            return this.type;
+        }
+
+        get IsGenerated(): boolean {
+            return this.isGenerated;
+        }
+
+        constructor(type = TextboxType.text, defaultText = "", placeholder = "") {
+            super();
+            this.placeholder = placeholder;
+            this.default = defaultText;
+            this.type = type;
+        }
+
+        public Generate(parent: JQuery, idName?: string) {
+            this.unique = idName != undefined ? idName : UniqueIdGenerater.Get().toString();
+            parent.append(`<div id="textbox${this.unique}group" />`);
+            this.groupObject = $(`#textbox${this.unique}group`);
+            this.groupObject.append(`<label id="textbox${this.unique}label" />`);
+            this.labelObject = $(`#textbox${this.unique}label`);
+            this.groupObject.append(`<input id="textbox${this.unique}input" />`);
+            this.inputObject = $(`$textbox${this.unique}input`);
+            this.groupObject.addClass("form-group");
+            this.labelObject.attr({ "for": `textbox${this.unique}input` });
+            this.labelObject.text(this.label);
+            this.inputObject.addClass("form-control");
+            this.inputObject.attr({ "type": TextboxType[this.type] });
+            this.inputObject.attr({ "placeholder": this.placeholder });
+            this.inputObject.val(this.default);
+            this.isGenerated = true;
+            this.reloadStatus();
+        }
+
+        private reloadStatus() {
+            if (!this.IsGenerated) return;
+            this.groupObject.removeClass("has-success has-warning has-danger");
+            if (this.Status == InputStatus.none) return;
+            this.groupObject.addClass(`has-${InputStatus[this.Status]}`);
+        }
+    }
+
+    export class Modal extends Component {
+        private isGenerated = false;
+        private unique: string = null;
+        private title = "";
+        private content = "";
+        private footer = "";
+        private object: JQuery = null;
+        private dialogObject: JQuery = null;
+        private contentObject: JQuery = null;
+        private headerObject: JQuery = null;
+        private bodyObject: JQuery = null;
+        private footerObject: JQuery = null;
+
+        get Title(): string {
+            return this.title;
+        }
+        set Title(value: string) {
+            this.title = value;
+            this.reload();
+        }
+
+        get Content(): string {
+            return this.content;
+        }
+        set Content(value: string) {
+            this.content = value;
+            this.reload();
+        }
+
+        get Footer(): string {
+            return this.footer;
+        }
+        set Footer(value: string) {
+            this.footer = value;
+            this.reload();
+        }
+
+        get IsGenerated(): boolean {
+            return this.isGenerated;
+        }
+
+        public Generate(parent: JQuery, idName?: string) {
+            this.unique = idName != undefined ? idName : UniqueIdGenerater.Get().toString();
+            parent.append(`<div id="modal${this.unique}" />`);
+            this.object = $(`#modal${this.unique}`);
+            this.object.append(`<div id="modal${this.unique}dialog" />`);
+            this.dialogObject = $(`#modal${this.unique}dialog`);
+            this.dialogObject.append(`<div id="modal${this.unique}content" />`);
+            this.contentObject = $(`#modal${this.unique}content`);
+            this.contentObject.append(`<div id="modal${this.unique}head" />`);
+            this.contentObject.append(`<div id="modal${this.unique}body" />`);
+            this.contentObject.append(`<div id="modal${this.unique}foot" />`);
+            this.headerObject = $(`#modal${this.unique}head`);
+            this.bodyObject = $(`#modal${this.unique}body`);
+            this.footerObject = $(`#modal${this.unique}foot`);
+            this.object.addClass("modal fade");
+            this.object.attr({
+                "tabindex": "-1",
+                "role": "dialog",
+                "aria-hidden": "true"
+            });
+            this.dialogObject.addClass("modal-dialog");
+            this.dialogObject.attr({ "role": "document" });
+            this.contentObject.addClass("modal-content");
+            this.headerObject.addClass("modal-header");
+            this.bodyObject.addClass("modal-body");
+            this.footerObject.addClass("modal-footer");
+            this.isGenerated = true;
+            this.reload();
+        }
+
+        public Show() {
+            (<any>this.object).modal("show");
+        }
+
+        public Hide() {
+            (<any>this.object).modal("hide");
+        }
+
+        private reload() {
+            if (!this.IsGenerated) return;
+            this.headerObject.empty();
+            this.headerObject.text(this.title);
+            this.headerObject.append(
+                `<button class="close" data-dismiss="modal" aria-label="Close">` +
+                `<span aria-hidden="true">&times;</span></button>`
+            );
+            this.bodyObject.text(this.content);
+            this.footerObject.text(this.footer);
+        }
+    }
 }

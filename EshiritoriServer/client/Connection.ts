@@ -129,5 +129,12 @@
         public GetRooms(callback: (data) => void){
             this.socket.emit("GetRooms", {}, data => callback(data));
         }
+
+        public VerifyPassword(roomId: string, inputPassword: string, callback: (success: boolean) => void){
+            this.socket.emit("VerifyPassword", {
+                inputPassword: inputPassword,
+                roomId: roomId
+            }, data => callback(data.success));
+        }
     }
 }

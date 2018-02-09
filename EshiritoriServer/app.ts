@@ -59,6 +59,17 @@ io.sockets.on("connection", socket => {
         });
     });
 
+    // パスワードの認証
+    socket.on("VerifyPassword", (data, ack) => {
+        if (rooms[data.roomId] == undefined) {
+            ack({ success: false });
+            return;
+        }
+        ack({
+            success: rooms[data.roomId].Password == data.inputPassword
+        });
+    });
+
     // 切断
     socket.on("disconnect", () => {
         // 全ての部屋に対して、このプレイヤーをRemoveするよう試みる。

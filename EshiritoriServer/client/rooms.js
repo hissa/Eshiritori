@@ -17,31 +17,14 @@ function show() {
 }
 var rooms = [];
 var rconnection = new Connections.Connection2();
-rconnection.EnterToNewRoom("testroom", "hissa", function () {
-    rconnection.GetRooms(function (data) {
-        data.forEach(function (value) {
-            var members = [];
-            console.log(value);
-            value.members.forEach(function (player) {
-                members.push(new Components.Player(player.id, player.name));
-            });
-            rooms.push(new Components.Room(value.name, members, value.hasPassword));
+rconnection.GetRooms(function (data) {
+    data.forEach(function (value) {
+        var members = [];
+        value.members.forEach(function (player) {
+            members.push(new Components.Player(player.id, player.name));
         });
-        show();
+        rooms.push(new Components.Room(value.name, members, value.hasPassword));
     });
+    show();
 });
-//rconnection.GetRooms(data => {
-//    data.forEach(value => {
-//        let members: Components.Player[] = [];
-//        value.members.forEach(player => {
-//            members.push(new Components.Player(player.id, player.name));
-//        });
-//        rooms.push(new Components.Room(
-//            value.name,
-//            members,
-//            value.hasPassword
-//        ));
-//    });
-//    show();
-//}); 
 //# sourceMappingURL=rooms.js.map
