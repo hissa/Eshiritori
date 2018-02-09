@@ -2,8 +2,14 @@
 //roomconnection.connect(new Connections.Player("hissa"));
 //roomconnection.setEventListener(Connections.SocketEvent.GetRoomsResponse, data => console.log(data));
 //roomconnection.getRooms();
-let rConnection = new Connections.Connection2();
-rConnection.EnterToNewRoom("testRoom", "hissa", data => {
-    console.log(data);
-    rConnection.GetRooms(data1 => console.log(data1));
-});
+//let rConnection = new Connections.Connection2();
+//rConnection.EnterToNewRoom("testRoom", "hissa", data => {
+//    console.log(data);
+//    rConnection.GetRooms(data1 => console.log(data1));
+//});
+let card = new Components.CardPanel();
+card.HeaderText = "ルーム一覧";
+card.Generate($("#body"), "roomList");
+let table = new Components.RoomList();
+table.Rooms = [new Components.Room("testroom", [new Components.Player("aaa", "hissa")], false)];
+table.Generate($("#cardpanelroomList"));

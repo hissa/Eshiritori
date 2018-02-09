@@ -649,4 +649,243 @@ namespace Components {
             this.ctx.clearRect(0, 0, this.Width, this.Height);
         }
     }
+
+    export class RoomList extends Component {
+        private isGenerated = false;
+        private object: JQuery = null;
+        private theadObject: JQuery = null;
+        private tbodyObject: JQuery = null;
+        private unique: string = null;
+        private rooms: Room[] = [];
+        private clickedEnterRoomEvent: (sender: Room) => void = () => { };
+
+        get IsGenerated(): boolean {
+            return this.isGenerated;
+        }
+
+        get Rooms(): any[] {
+            return this.rooms;
+        }
+        set Rooms(value: any[]) {
+            this.rooms = value;
+            this.reload();
+        }
+
+        set ClickedEnterRoomEvent(func: () => void) {
+            this.clickedEnterRoomEvent = func;
+        }
+
+        public Generate(parent: JQuery, idName?: string) {
+            this.unique = idName != undefined ? idName : UniqueIdGenerater.Get().toString();
+            parent.append(`<table id="roomlist${this.unique}" />`);
+            this.object = $(`#roomlist${this.unique}`);
+            this.object.addClass("table");
+            this.object.append(`<thead id="roomlistThead${this.unique}" />`);
+            this.theadObject = $(`#roomlistThead${this.unique}`);
+            this.object.append(`<tbody id="roomlistTbody${this.unique}" />`);
+            this.tbodyObject = $(`#roomlistTbody${this.unique}`);
+            this.theadObject.append(`<tr id="roomlistHeadTr${this.unique}" />`);
+            let tr = $(`#roomlistHeadTr${this.unique}`);
+            tr.append("<th>ルーム名</th>");
+            tr.append("<th>在室人数</th>");
+            tr.append("<th>パスワード</th>");
+            tr.append("<th>入室</th>");
+            this.isGenerated = true;
+            this.reload();
+        }
+
+        private reload() {
+            if (!this.IsGenerated) return;
+            this.clear();
+            this.Rooms.forEach((value: Room, index: number) => {
+                console.log(value);
+                this.tbodyObject.append(`<tr id="roomlist${this.unique}Row${index}"></tr>`);
+                let tr = $(`#roomlist${this.unique}Row${index}`);
+                tr.append(`<td>${value.Name}</td>`);
+                tr.append(`<td>${value.Members.length}</td>`);
+                tr.append(`<td>${value.HasPassword ? "有" : "無"}</td>`);
+                tr.append(`<td><span id=\"roomlist${this.unique}Row${index}enterButton\" /></td>`);
+                let enterButton = new Button();
+                enterButton.Style = ButtonStyle.primary;
+                enterButton.Text = "入室";
+                enterButton.ClickedEvent = () => this.clickedEnterRoomEvent(value);
+                enterButton.Generate($(`#roomlist${this.unique}Row${index}enterButton`));
+            });
+        }
+
+        private clear() {
+            this.tbodyObject.empty();
+        }
+    }
+
+    export enum ButtonStyle {
+        none, primary, secondary, success, info, warning, danger, link
+    }
+
+    export enum ButtonSize {
+        Default, Large, Small, Block
+    }
+
+    export enum ButtonStatus {
+        Default, Disabled, Toggle
+    }
+
+    export class Button extends Component {
+        private isGenerated = false;
+        private object: JQuery = null;
+        private unique: string = null;
+        private text: string = null;
+        private style: ButtonStyle = ButtonStyle.none;
+        private isOutline: boolean = false;
+        private size: ButtonSize = ButtonSize.Default;
+        private isPressed: boolean = false;
+        private status: ButtonStatus = ButtonStatus.Default;
+        private clickedEvent: (e: JQueryMouseEventObject) => void = () => { };
+
+        get Text(): string {
+            return this.text;
+        }
+        set Text(value: string) {
+            this.text = value;
+            this.reload();
+        }
+
+        get Style(): ButtonStyle {
+            return this.style;
+        }
+        set Style(value: ButtonStyle) {
+            this.style = value;
+            this.reload();
+        }
+
+        get IsOutline(): boolean {
+            return this.isOutline;
+        }
+        set IsOutline(value: boolean) {
+            this.isOutline = value;
+            this.reload();
+        }
+
+        get Size(): ButtonSize {
+            return this.size;
+        }
+        set Size(value: ButtonSize) {
+            this.size = value;
+            this.reload();
+        }
+
+        get IsPressed(): boolean {
+            return this.isPressed;
+        }
+        set IsPressed(value: boolean) {
+            this.isPressed = value;
+            this.reload();
+        }
+
+        get Status(): ButtonStatus {
+            return this.status;
+        }
+        set Status(value: ButtonStatus) {
+            this.status = value;
+            this.reload();
+        }
+
+        get IsGenerated(): boolean {
+            return this.isGenerated;
+        }
+
+        set ClickedEvent(func: (e: JQueryMouseEventObject) => void) {
+            this.clickedEvent = func;
+            if (this.IsGenerated) {
+                this.object.off("click");
+                this.object.on("click", this.clickedEvent);
+            }
+        }
+
+        public Generate(parent: JQuery, idName?: string) {
+            this.unique = idName != undefined ? idName : UniqueIdGenerater.Get().toString();
+            parent.append(`<button id="button${this.unique}" />`);
+            this.object = $(`#button${this.unique}`);
+            this.object.on("click", e => this.clickedEvent(e));
+            this.isGenerated = true;
+            this.reload();
+        }
+
+        private reload() {
+            if (!this.isGenerated) return;
+            this.clear();
+            this.object.addClass("btn");
+            if (this.Style != ButtonStyle.none) {
+                this.object.addClass(`btn-${this.IsOutline ? "outline-" : ""}${ButtonStyle[this.Style]}`);
+            }
+            let size = "";
+            switch (this.Size) {
+                default:
+                    size = "";
+                    break;
+                case ButtonSize.Large:
+                    size = "btn-lg";
+                    break;
+                case ButtonSize.Small:
+                    size = "btn-sm";
+                    break;
+                case ButtonSize.Block:
+                    size = "btn-lg btn-block";
+                    break;
+            }
+            if (this.Size != ButtonSize.Default) {
+                this.object.addClass(size);
+            }
+            if (this.IsPressed) {
+                this.object.addClass("active");
+                this.object.attr({ "role": "button" });
+                this.object.attr({ "aria-pressed": "true" });
+            }
+            if (this.Status == ButtonStatus.Disabled){
+                this.object.prop("disabled");
+            }
+            if (this.Status == ButtonStatus.Toggle) {
+                this.object.attr({
+                    "data-toggle": "button",
+                    "aria-pressed": "false",
+                    "autocomplete": "off"
+                });
+            }
+            this.object.text(this.Text);
+        }
+
+        private clear() {
+            this.object.removeClass();
+            this.object.removeAttr("aria-pressed");
+            this.object.removeAttr("autocomplete");
+            this.object.removeAttr("role");
+            this.object.removeProp("disabled");
+            this.object.text("");
+        }
+    }
+
+    export class Room {
+        private name: string = null;
+        private members: Player[] = [];
+        private id: string = null;
+        private hasPassword: boolean = null;
+
+        get Name(): string {
+            return this.name;
+        }
+
+        get Members(): Player[] {
+            return this.members;
+        }
+
+        get HasPassword(): boolean {
+            return this.hasPassword;
+        }
+
+        constructor(name: string, members: Player[], hasPassword: boolean) {
+            this.name = name;
+            this.members = members;
+            this.hasPassword = hasPassword;
+        }
+    }
 }

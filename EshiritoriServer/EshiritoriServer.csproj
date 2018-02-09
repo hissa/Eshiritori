@@ -28,15 +28,19 @@
     <TypeScriptCompile Include="client\MyCanvas.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
+    <TypeScriptCompile Include="client\rooms.ts" />
     <TypeScriptCompile Include="client\script.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
+    <TypeScriptCompile Include="Room.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\node\node.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\socket.io-client\socket.io-client.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\socket.io\socket.io.d.ts" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="client\index.html" />
+    <Content Include="client\rooms.html" />
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

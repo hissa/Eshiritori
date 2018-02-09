@@ -758,5 +758,306 @@ var Components;
         return PenSizeSample;
     }(Component));
     Components.PenSizeSample = PenSizeSample;
+    var RoomList = (function (_super) {
+        __extends(RoomList, _super);
+        function RoomList() {
+            _super.apply(this, arguments);
+            this.isGenerated = false;
+            this.object = null;
+            this.theadObject = null;
+            this.tbodyObject = null;
+            this.unique = null;
+            this.rooms = [];
+            this.clickedEnterRoomEvent = function () { };
+        }
+        Object.defineProperty(RoomList.prototype, "IsGenerated", {
+            get: function () {
+                return this.isGenerated;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(RoomList.prototype, "Rooms", {
+            get: function () {
+                return this.rooms;
+            },
+            set: function (value) {
+                this.rooms = value;
+                this.reload();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(RoomList.prototype, "ClickedEnterRoomEvent", {
+            set: function (func) {
+                this.clickedEnterRoomEvent = func;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        RoomList.prototype.Generate = function (parent, idName) {
+            this.unique = idName != undefined ? idName : UniqueIdGenerater.Get().toString();
+            parent.append("<table id=\"roomlist" + this.unique + "\" />");
+            this.object = $("#roomlist" + this.unique);
+            this.object.addClass("table");
+            this.object.append("<thead id=\"roomlistThead" + this.unique + "\" />");
+            this.theadObject = $("#roomlistThead" + this.unique);
+            this.object.append("<tbody id=\"roomlistTbody" + this.unique + "\" />");
+            this.tbodyObject = $("#roomlistTbody" + this.unique);
+            this.theadObject.append("<tr id=\"roomlistHeadTr" + this.unique + "\" />");
+            var tr = $("#roomlistHeadTr" + this.unique);
+            tr.append("<th>ルーム名</th>");
+            tr.append("<th>在室人数</th>");
+            tr.append("<th>パスワード</th>");
+            tr.append("<th>入室</th>");
+            this.isGenerated = true;
+            this.reload();
+        };
+        RoomList.prototype.reload = function () {
+            var _this = this;
+            if (!this.IsGenerated)
+                return;
+            this.clear();
+            this.Rooms.forEach(function (value, index) {
+                console.log(value);
+                _this.tbodyObject.append("<tr id=\"roomlist" + _this.unique + "Row" + index + "\"></tr>");
+                var tr = $("#roomlist" + _this.unique + "Row" + index);
+                tr.append("<td>" + value.Name + "</td>");
+                tr.append("<td>" + value.Members.length + "</td>");
+                tr.append("<td>" + (value.HasPassword ? "有" : "無") + "</td>");
+                tr.append("<td><span id=\"roomlist" + _this.unique + "Row" + index + "enterButton\" /></td>");
+                var enterButton = new Button();
+                enterButton.Style = ButtonStyle.primary;
+                enterButton.Text = "入室";
+                enterButton.ClickedEvent = function () { return _this.clickedEnterRoomEvent(value); };
+                enterButton.Generate($("#roomlist" + _this.unique + "Row" + index + "enterButton"));
+            });
+        };
+        RoomList.prototype.clear = function () {
+            this.tbodyObject.empty();
+        };
+        return RoomList;
+    }(Component));
+    Components.RoomList = RoomList;
+    (function (ButtonStyle) {
+        ButtonStyle[ButtonStyle["none"] = 0] = "none";
+        ButtonStyle[ButtonStyle["primary"] = 1] = "primary";
+        ButtonStyle[ButtonStyle["secondary"] = 2] = "secondary";
+        ButtonStyle[ButtonStyle["success"] = 3] = "success";
+        ButtonStyle[ButtonStyle["info"] = 4] = "info";
+        ButtonStyle[ButtonStyle["warning"] = 5] = "warning";
+        ButtonStyle[ButtonStyle["danger"] = 6] = "danger";
+        ButtonStyle[ButtonStyle["link"] = 7] = "link";
+    })(Components.ButtonStyle || (Components.ButtonStyle = {}));
+    var ButtonStyle = Components.ButtonStyle;
+    (function (ButtonSize) {
+        ButtonSize[ButtonSize["Default"] = 0] = "Default";
+        ButtonSize[ButtonSize["Large"] = 1] = "Large";
+        ButtonSize[ButtonSize["Small"] = 2] = "Small";
+        ButtonSize[ButtonSize["Block"] = 3] = "Block";
+    })(Components.ButtonSize || (Components.ButtonSize = {}));
+    var ButtonSize = Components.ButtonSize;
+    (function (ButtonStatus) {
+        ButtonStatus[ButtonStatus["Default"] = 0] = "Default";
+        ButtonStatus[ButtonStatus["Disabled"] = 1] = "Disabled";
+        ButtonStatus[ButtonStatus["Toggle"] = 2] = "Toggle";
+    })(Components.ButtonStatus || (Components.ButtonStatus = {}));
+    var ButtonStatus = Components.ButtonStatus;
+    var Button = (function (_super) {
+        __extends(Button, _super);
+        function Button() {
+            _super.apply(this, arguments);
+            this.isGenerated = false;
+            this.object = null;
+            this.unique = null;
+            this.text = null;
+            this.style = ButtonStyle.none;
+            this.isOutline = false;
+            this.size = ButtonSize.Default;
+            this.isPressed = false;
+            this.status = ButtonStatus.Default;
+            this.clickedEvent = function () { };
+        }
+        Object.defineProperty(Button.prototype, "Text", {
+            get: function () {
+                return this.text;
+            },
+            set: function (value) {
+                this.text = value;
+                this.reload();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Button.prototype, "Style", {
+            get: function () {
+                return this.style;
+            },
+            set: function (value) {
+                this.style = value;
+                this.reload();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Button.prototype, "IsOutline", {
+            get: function () {
+                return this.isOutline;
+            },
+            set: function (value) {
+                this.isOutline = value;
+                this.reload();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Button.prototype, "Size", {
+            get: function () {
+                return this.size;
+            },
+            set: function (value) {
+                this.size = value;
+                this.reload();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Button.prototype, "IsPressed", {
+            get: function () {
+                return this.isPressed;
+            },
+            set: function (value) {
+                this.isPressed = value;
+                this.reload();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Button.prototype, "Status", {
+            get: function () {
+                return this.status;
+            },
+            set: function (value) {
+                this.status = value;
+                this.reload();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Button.prototype, "IsGenerated", {
+            get: function () {
+                return this.isGenerated;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Button.prototype, "ClickedEvent", {
+            set: function (func) {
+                this.clickedEvent = func;
+                if (this.IsGenerated) {
+                    this.object.off("click");
+                    this.object.on("click", this.clickedEvent);
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Button.prototype.Generate = function (parent, idName) {
+            var _this = this;
+            this.unique = idName != undefined ? idName : UniqueIdGenerater.Get().toString();
+            parent.append("<button id=\"button" + this.unique + "\" />");
+            this.object = $("#button" + this.unique);
+            this.object.on("click", function (e) { return _this.clickedEvent(e); });
+            this.isGenerated = true;
+            this.reload();
+        };
+        Button.prototype.reload = function () {
+            if (!this.isGenerated)
+                return;
+            this.clear();
+            this.object.addClass("btn");
+            if (this.Style != ButtonStyle.none) {
+                this.object.addClass("btn-" + (this.IsOutline ? "outline-" : "") + ButtonStyle[this.Style]);
+            }
+            var size = "";
+            switch (this.Size) {
+                default:
+                    size = "";
+                    break;
+                case ButtonSize.Large:
+                    size = "btn-lg";
+                    break;
+                case ButtonSize.Small:
+                    size = "btn-sm";
+                    break;
+                case ButtonSize.Block:
+                    size = "btn-lg btn-block";
+                    break;
+            }
+            if (this.Size != ButtonSize.Default) {
+                this.object.addClass(size);
+            }
+            if (this.IsPressed) {
+                this.object.addClass("active");
+                this.object.attr({ "role": "button" });
+                this.object.attr({ "aria-pressed": "true" });
+            }
+            if (this.Status == ButtonStatus.Disabled) {
+                this.object.prop("disabled");
+            }
+            if (this.Status == ButtonStatus.Toggle) {
+                this.object.attr({
+                    "data-toggle": "button",
+                    "aria-pressed": "false",
+                    "autocomplete": "off"
+                });
+            }
+            this.object.text(this.Text);
+        };
+        Button.prototype.clear = function () {
+            this.object.removeClass();
+            this.object.removeAttr("aria-pressed");
+            this.object.removeAttr("autocomplete");
+            this.object.removeAttr("role");
+            this.object.removeProp("disabled");
+            this.object.text("");
+        };
+        return Button;
+    }(Component));
+    Components.Button = Button;
+    var Room = (function () {
+        function Room(name, members, hasPassword) {
+            this.name = null;
+            this.members = [];
+            this.id = null;
+            this.hasPassword = null;
+            this.name = name;
+            this.members = members;
+            this.hasPassword = hasPassword;
+        }
+        Object.defineProperty(Room.prototype, "Name", {
+            get: function () {
+                return this.name;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Room.prototype, "Members", {
+            get: function () {
+                return this.members;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Room.prototype, "HasPassword", {
+            get: function () {
+                return this.hasPassword;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        return Room;
+    }());
+    Components.Room = Room;
 })(Components || (Components = {}));
 //# sourceMappingURL=Components.js.map
