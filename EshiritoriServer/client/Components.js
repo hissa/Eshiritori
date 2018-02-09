@@ -827,7 +827,6 @@ var Components;
                 return;
             this.clear();
             this.Rooms.forEach(function (value, index) {
-                console.log(value);
                 _this.tbodyObject.append("<tr id=\"roomlist" + _this.unique + "Row" + index + "\"></tr>");
                 var tr = $("#roomlist" + _this.unique + "Row" + index);
                 tr.append("<td>" + value.Name + "</td>");

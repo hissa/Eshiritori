@@ -7,9 +7,46 @@
 //    console.log(data);
 //    rConnection.GetRooms(data1 => console.log(data1));
 //});
-let card = new Components.CardPanel();
-card.HeaderText = "ルーム一覧";
-card.Generate($("#body"), "roomList");
-let table = new Components.RoomList();
-table.Rooms = [new Components.Room("testroom", [new Components.Player("aaa", "hissa")], false)];
-table.Generate($("#cardpanelroomList"));
+
+function show() {
+    let card = new Components.CardPanel();
+    card.HeaderText = "ルーム一覧";
+    card.Generate($("#body"), "roomList");
+    let table = new Components.RoomList();
+    table.Rooms = rooms;
+    table.Generate($("#cardpanelroomList"));
+}
+
+let rooms: Components.Room[] = [];
+let rconnection = new Connections.Connection2();
+rconnection.EnterToNewRoom("testroom", "hissa", () => {
+    rconnection.GetRooms(data => {
+        data.forEach(value => {
+            let members: Components.Player[] = [];
+            console.log(value);
+            value.members.forEach(player => {
+                members.push(new Components.Player(player.id, player.name));
+            });
+            rooms.push(new Components.Room(
+                value.name,
+                members,
+                value.hasPassword
+            ));
+        });
+        show();
+    });
+});
+//rconnection.GetRooms(data => {
+//    data.forEach(value => {
+//        let members: Components.Player[] = [];
+//        value.members.forEach(player => {
+//            members.push(new Components.Player(player.id, player.name));
+//        });
+//        rooms.push(new Components.Room(
+//            value.name,
+//            members,
+//            value.hasPassword
+//        ));
+//    });
+//    show();
+//});

@@ -706,7 +706,6 @@ namespace Components {
             if (!this.IsGenerated) return;
             this.clear();
             this.Rooms.forEach((value: Room, index: number) => {
-                console.log(value);
                 this.tbodyObject.append(`<tr id="roomlist${this.unique}Row${index}"></tr>`);
                 let tr = $(`#roomlist${this.unique}Row${index}`);
                 tr.append(`<td>${value.Name}</td>`);

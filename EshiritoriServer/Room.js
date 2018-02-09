@@ -77,7 +77,7 @@ var Room = (function () {
     Room.prototype.ToHash = function () {
         var membersHash = [];
         this.members.forEach(function (value) {
-            membersHash.push(value.ToHash);
+            membersHash.push(value.ToHash());
         });
         return {
             name: this.RoomName,
@@ -112,8 +112,8 @@ var Player = (function () {
     });
     Player.prototype.ToHash = function () {
         return {
-            id: this.Id,
-            name: this.Name
+            id: this.id,
+            name: this.name
         };
     };
     Player.Parse = function (data) {

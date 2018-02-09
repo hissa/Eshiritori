@@ -62,7 +62,7 @@
     public ToHash() {
         let membersHash = [];
         this.members.forEach(value => {
-            membersHash.push(value.ToHash);
+            membersHash.push(value.ToHash());
         });
         return {
             name: this.RoomName,
@@ -92,8 +92,8 @@ export class Player {
 
     public ToHash() {
         return {
-            id: this.Id,
-            name: this.Name
+            id: this.id,
+            name: this.name
         };
     }
 
