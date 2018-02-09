@@ -97,4 +97,37 @@
             this.socketio.on(SocketEvent[SocketEvent.GetRoomsResponse], () => { });
         }
     }
+
+    export enum Connection2Event {
+
+    };
+
+    export class Connection2 {
+        private socket: SocketIOClient.Socket = null;
+        private playerName: string = null;
+
+        get PlayerName(): string {
+            return this.playerName;
+        }
+        set PlayerName(value: string) {
+            this.playerName = value;
+        }
+
+        constructor() {
+            this.socket = io.connect("/");
+        }
+
+        public EnterToNewRoom(roomName: string, playerName: string, callback: (data) => void) {
+            this.socket.emit("NewRoom", { roomName: roomName }, retData => {
+                let roomId = retData.roomId;
+                this.socket.emit("EnterToRoom", { roomId: roomId, playerName: playerName }, retData2 => {
+                    callback(retData2);
+                });
+            });
+        }
+
+        public GetRooms(callback: (data) => void){
+            this.socket.emit("GetRooms", {}, data => callback(data));
+        }
+    }
 }

@@ -45,13 +45,15 @@
     }
 
     public RemovePlayer(playerId: string) {
-        let remIndex = 0;
+        let remIndex: number = null;
         this.Members.forEach((value, index) => {
             if (value.Id == playerId) {
                 remIndex = index;
             }
         });
-        this.members.splice(remIndex, 1);
+        if (remIndex != null) {
+            this.members.splice(remIndex, 1);
+        }
         if (this.Members.length <= 0) {
             this.beEmptyEvent(this);
         }

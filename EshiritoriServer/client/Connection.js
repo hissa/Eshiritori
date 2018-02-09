@@ -97,5 +97,40 @@ var Connections;
         return Connection;
     }());
     Connections.Connection = Connection;
+    (function (Connection2Event) {
+    })(Connections.Connection2Event || (Connections.Connection2Event = {}));
+    var Connection2Event = Connections.Connection2Event;
+    ;
+    var Connection2 = (function () {
+        function Connection2() {
+            this.socket = null;
+            this.playerName = null;
+            this.socket = io.connect("/");
+        }
+        Object.defineProperty(Connection2.prototype, "PlayerName", {
+            get: function () {
+                return this.playerName;
+            },
+            set: function (value) {
+                this.playerName = value;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Connection2.prototype.EnterToNewRoom = function (roomName, playerName, callback) {
+            var _this = this;
+            this.socket.emit("NewRoom", { roomName: roomName }, function (retData) {
+                var roomId = retData.roomId;
+                _this.socket.emit("EnterToRoom", { roomId: roomId, playerName: playerName }, function (retData2) {
+                    callback(retData2);
+                });
+            });
+        };
+        Connection2.prototype.GetRooms = function (callback) {
+            this.socket.emit("GetRooms", {}, function (data) { return callback(data); });
+        };
+        return Connection2;
+    }());
+    Connections.Connection2 = Connection2;
 })(Connections || (Connections = {}));
 //# sourceMappingURL=Connection.js.map

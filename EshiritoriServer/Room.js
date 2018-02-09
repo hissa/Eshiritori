@@ -61,13 +61,15 @@ var Room = (function () {
         this.members.push(player);
     };
     Room.prototype.RemovePlayer = function (playerId) {
-        var remIndex = 0;
+        var remIndex = null;
         this.Members.forEach(function (value, index) {
             if (value.Id == playerId) {
                 remIndex = index;
             }
         });
-        this.members.splice(remIndex, 1);
+        if (remIndex != null) {
+            this.members.splice(remIndex, 1);
+        }
         if (this.Members.length <= 0) {
             this.beEmptyEvent(this);
         }
