@@ -830,7 +830,7 @@ var Components;
                 _this.tbodyObject.append("<tr id=\"roomlist" + _this.unique + "Row" + index + "\"></tr>");
                 var tr = $("#roomlist" + _this.unique + "Row" + index);
                 tr.append("<td>" + value.Name + "</td>");
-                tr.append("<td>" + value.Members.length + "</td>");
+                tr.append("<td id=\"roomlist" + _this.unique + "Row" + index + "member\">" + value.Members.length + "</td>");
                 tr.append("<td>" + (value.HasPassword ? "有" : "無") + "</td>");
                 tr.append("<td><span id=\"roomlist" + _this.unique + "Row" + index + "enterButton\" /></td>");
                 var enterButton = new Button();
@@ -838,7 +838,22 @@ var Components;
                 enterButton.Text = "入室";
                 enterButton.ClickedEvent = function () { return _this.clickedEnterRoomEvent(value); };
                 enterButton.Generate($("#roomlist" + _this.unique + "Row" + index + "enterButton"));
+                var member = $("#roomlist" + _this.unique + "Row" + index + "member");
+                var memberStr = "";
+                value.Members.forEach(function (player, index) {
+                    memberStr += player.Name;
+                    // 最後の要素はカンマなどを付けない
+                    if (value.Members.length - 1 > index) {
+                        memberStr += ", ";
+                    }
+                });
+                member.attr({
+                    "data-toggle": "tooltip",
+                    "data-placement": "bottom",
+                    "title": memberStr
+                });
             });
+            $('[data-toggle="tooltip"]').tooltip();
         };
         RoomList.prototype.clear = function () {
             this.tbodyObject.empty();

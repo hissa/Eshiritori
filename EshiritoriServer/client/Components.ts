@@ -709,7 +709,7 @@ namespace Components {
                 this.tbodyObject.append(`<tr id="roomlist${this.unique}Row${index}"></tr>`);
                 let tr = $(`#roomlist${this.unique}Row${index}`);
                 tr.append(`<td>${value.Name}</td>`);
-                tr.append(`<td>${value.Members.length}</td>`);
+                tr.append(`<td id="roomlist${this.unique}Row${index}member">${value.Members.length}</td>`);
                 tr.append(`<td>${value.HasPassword ? "有" : "無"}</td>`);
                 tr.append(`<td><span id=\"roomlist${this.unique}Row${index}enterButton\" /></td>`);
                 let enterButton = new Button();
@@ -717,7 +717,22 @@ namespace Components {
                 enterButton.Text = "入室";
                 enterButton.ClickedEvent = () => this.clickedEnterRoomEvent(value);
                 enterButton.Generate($(`#roomlist${this.unique}Row${index}enterButton`));
+                let member = $(`#roomlist${this.unique}Row${index}member`);
+                let memberStr = "";
+                value.Members.forEach((player, index) => {
+                    memberStr += player.Name;
+                    // 最後の要素はカンマなどを付けない
+                    if (value.Members.length - 1 > index) {
+                        memberStr += ", ";
+                    }
+                });
+                member.attr({
+                    "data-toggle": "tooltip",
+                    "data-placement": "bottom",
+                    "title": memberStr
+                });
             });
+            (<any>$('[data-toggle="tooltip"]')).tooltip();
         }
 
         private clear() {
