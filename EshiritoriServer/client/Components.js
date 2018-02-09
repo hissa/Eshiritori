@@ -1118,6 +1118,7 @@ var Components;
             this.type = TextboxType.text;
             this.label = "";
             this.status = InputStatus.none;
+            this.isDisable = false;
             this.groupObject = null;
             this.inputObject = null;
             this.labelObject = null;
@@ -1131,7 +1132,27 @@ var Components;
             },
             set: function (value) {
                 this.label = value;
-                this.labelObject.val(this.label);
+                if (!this.IsGenerated)
+                    return;
+                this.labelObject.text(this.label);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Textbox.prototype, "IsDisable", {
+            get: function () {
+                return this.isDisable;
+            },
+            set: function (value) {
+                this.isDisable = value;
+                if (!this.IsGenerated)
+                    return;
+                if (this.IsDisable) {
+                    this.inputObject.prop("disabled", true);
+                }
+                else {
+                    this.inputObject.removeProp("disabled");
+                }
             },
             enumerable: true,
             configurable: true
@@ -1182,7 +1203,7 @@ var Components;
             this.groupObject.append("<label id=\"textbox" + this.unique + "label\" />");
             this.labelObject = $("#textbox" + this.unique + "label");
             this.groupObject.append("<input id=\"textbox" + this.unique + "input\" />");
-            this.inputObject = $("$textbox" + this.unique + "input");
+            this.inputObject = $("#textbox" + this.unique + "input");
             this.groupObject.addClass("form-group");
             this.labelObject.attr({ "for": "textbox" + this.unique + "input" });
             this.labelObject.text(this.label);
@@ -1190,6 +1211,9 @@ var Components;
             this.inputObject.attr({ "type": TextboxType[this.type] });
             this.inputObject.attr({ "placeholder": this.placeholder });
             this.inputObject.val(this.default);
+            if (this.IsDisable) {
+                this.inputObject.prop("disabled", true);
+            }
             this.isGenerated = true;
             this.reloadStatus();
         };
@@ -1226,7 +1250,12 @@ var Components;
             },
             set: function (value) {
                 this.title = value;
-                this.reload();
+                if (!this.IsGenerated)
+                    return;
+                this.headerObject.empty();
+                this.headerObject.html(this.title);
+                this.headerObject.append("<button class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\">" +
+                    "<span aria-hidden=\"true\">&times;</span></button>");
             },
             enumerable: true,
             configurable: true
@@ -1237,7 +1266,9 @@ var Components;
             },
             set: function (value) {
                 this.content = value;
-                this.reload();
+                if (!this.IsGenerated)
+                    return;
+                this.bodyObject.html(this.content);
             },
             enumerable: true,
             configurable: true
@@ -1248,7 +1279,30 @@ var Components;
             },
             set: function (value) {
                 this.footer = value;
-                this.reload();
+                if (!this.IsGenerated)
+                    return;
+                this.footerObject.html(this.footer);
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Modal.prototype, "HeaderObject", {
+            get: function () {
+                return this.headerObject;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Modal.prototype, "BodyObject", {
+            get: function () {
+                return this.bodyObject;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Modal.prototype, "FooterObject", {
+            get: function () {
+                return this.footerObject;
             },
             enumerable: true,
             configurable: true
@@ -1299,14 +1353,109 @@ var Components;
             if (!this.IsGenerated)
                 return;
             this.headerObject.empty();
-            this.headerObject.text(this.title);
+            this.headerObject.html(this.title);
             this.headerObject.append("<button class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\">" +
                 "<span aria-hidden=\"true\">&times;</span></button>");
-            this.bodyObject.text(this.content);
-            this.footerObject.text(this.footer);
+            this.bodyObject.html(this.content);
+            this.footerObject.html(this.footer);
         };
         return Modal;
     }(Component));
     Components.Modal = Modal;
+    var RoomModal = (function (_super) {
+        __extends(RoomModal, _super);
+        function RoomModal(room) {
+            _super.call(this);
+            this.room = null;
+            this.modal = null;
+            this.unique = null;
+            this.enterButton = null;
+            this.closeButton = null;
+            this.playerNameForm = null;
+            this.passwordForm = null;
+            this.playerlist = null;
+            this.clickedEnterRoomEvent = function () { };
+            this.room = room;
+            this.unique = UniqueIdGenerater.Get().toString();
+            this.modal = new Modal();
+        }
+        Object.defineProperty(RoomModal.prototype, "RoomName", {
+            get: function () {
+                return this.room.Name;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(RoomModal.prototype, "HasPassword", {
+            get: function () {
+                return this.room.HasPassword;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(RoomModal.prototype, "Players", {
+            get: function () {
+                return this.room.Members;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(RoomModal.prototype, "IsGenerated", {
+            get: function () {
+                return this.modal.IsGenerated;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(RoomModal.prototype, "ClickedEnterRoomEvent", {
+            set: function (func) {
+                this.clickedEnterRoomEvent = func;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        RoomModal.prototype.Generate = function (parent) {
+            this.modal.Generate(parent);
+            this.reload();
+        };
+        RoomModal.prototype.Show = function () {
+            this.modal.Show();
+        };
+        RoomModal.prototype.Hide = function () {
+            this.modal.Hide();
+        };
+        RoomModal.prototype.reload = function () {
+            var _this = this;
+            this.modal.Title = this.RoomName;
+            // footer
+            this.closeButton = new Button();
+            this.closeButton.Text = "キャンセル";
+            this.closeButton.ClickedEvent = function () { return _this.modal.Hide(); };
+            this.closeButton.Generate(this.modal.FooterObject);
+            this.enterButton = new Button();
+            this.enterButton.Style = ButtonStyle.primary;
+            this.enterButton.Text = "入室";
+            this.enterButton.ClickedEvent = function () { return _this.clickedEnter(); };
+            this.enterButton.Generate(this.modal.FooterObject);
+            // body
+            this.playerNameForm = new Textbox(TextboxType.text, "", "プレイヤー名を入力してください。");
+            this.playerNameForm.Label = "プレイヤー名";
+            this.passwordForm = new Textbox(TextboxType.password, "", "パスワードを入力してください。");
+            this.passwordForm.Label = "パスワード";
+            if (!this.HasPassword) {
+                this.passwordForm.IsDisable = true;
+            }
+            this.playerNameForm.Generate(this.modal.BodyObject);
+            this.passwordForm.Generate(this.modal.BodyObject);
+            this.playerlist = new PlayerList();
+            this.room.Members.forEach(function (value) { return _this.playerlist.addPlayer(value); });
+            this.modal.BodyObject.append("在室プレイヤー");
+            this.playerlist.Generate(this.modal.BodyObject);
+        };
+        RoomModal.prototype.clickedEnter = function () {
+        };
+        return RoomModal;
+    }(Component));
+    Components.RoomModal = RoomModal;
 })(Components || (Components = {}));
 //# sourceMappingURL=Components.js.map

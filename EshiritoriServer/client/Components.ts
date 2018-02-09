@@ -940,6 +940,7 @@ namespace Components {
         private type: TextboxType = TextboxType.text;
         private label: string = "";
         private status: InputStatus = InputStatus.none;
+        private isDisable = false;
         private groupObject: JQuery = null;
         private inputObject: JQuery = null;
         private labelObject: JQuery = null;
@@ -949,7 +950,21 @@ namespace Components {
         }
         set Label(value: string) {
             this.label = value;
-            this.labelObject.val(this.label);
+            if (!this.IsGenerated) return;
+            this.labelObject.text(this.label);
+        }
+
+        get IsDisable(): boolean {
+            return this.isDisable;
+        }
+        set IsDisable(value: boolean) {
+            this.isDisable = value;
+            if (!this.IsGenerated) return;
+            if (this.IsDisable) {
+                this.inputObject.prop("disabled", true);
+            } else {
+                this.inputObject.removeProp("disabled");
+            }
         }
 
         get Status(): InputStatus {
@@ -990,7 +1005,7 @@ namespace Components {
             this.groupObject.append(`<label id="textbox${this.unique}label" />`);
             this.labelObject = $(`#textbox${this.unique}label`);
             this.groupObject.append(`<input id="textbox${this.unique}input" />`);
-            this.inputObject = $(`$textbox${this.unique}input`);
+            this.inputObject = $(`#textbox${this.unique}input`);
             this.groupObject.addClass("form-group");
             this.labelObject.attr({ "for": `textbox${this.unique}input` });
             this.labelObject.text(this.label);
@@ -998,6 +1013,9 @@ namespace Components {
             this.inputObject.attr({ "type": TextboxType[this.type] });
             this.inputObject.attr({ "placeholder": this.placeholder });
             this.inputObject.val(this.default);
+            if (this.IsDisable) {
+                this.inputObject.prop("disabled", true);
+            }
             this.isGenerated = true;
             this.reloadStatus();
         }
@@ -1028,7 +1046,13 @@ namespace Components {
         }
         set Title(value: string) {
             this.title = value;
-            this.reload();
+            if (!this.IsGenerated) return;
+            this.headerObject.empty();
+            this.headerObject.html(this.title);
+            this.headerObject.append(
+                `<button class="close" data-dismiss="modal" aria-label="Close">` +
+                `<span aria-hidden="true">&times;</span></button>`
+            );
         }
 
         get Content(): string {
@@ -1036,7 +1060,8 @@ namespace Components {
         }
         set Content(value: string) {
             this.content = value;
-            this.reload();
+            if (!this.IsGenerated) return;
+            this.bodyObject.html(this.content);
         }
 
         get Footer(): string {
@@ -1044,7 +1069,20 @@ namespace Components {
         }
         set Footer(value: string) {
             this.footer = value;
-            this.reload();
+            if (!this.IsGenerated) return;
+            this.footerObject.html(this.footer);
+        }
+
+        get HeaderObject(): JQuery {
+            return this.headerObject;
+        }
+
+        get BodyObject(): JQuery {
+            return this.bodyObject;
+        }
+
+        get FooterObject(): JQuery {
+            return this.footerObject;
         }
 
         get IsGenerated(): boolean {
@@ -1092,13 +1130,97 @@ namespace Components {
         private reload() {
             if (!this.IsGenerated) return;
             this.headerObject.empty();
-            this.headerObject.text(this.title);
+            this.headerObject.html(this.title);
             this.headerObject.append(
                 `<button class="close" data-dismiss="modal" aria-label="Close">` +
                 `<span aria-hidden="true">&times;</span></button>`
             );
-            this.bodyObject.text(this.content);
-            this.footerObject.text(this.footer);
+            this.bodyObject.html(this.content);
+            this.footerObject.html(this.footer);
+        }
+    }
+
+    export class RoomModal extends Component {
+        private room: Room = null;
+        private modal: Modal = null;
+        private unique: string = null;
+        private enterButton: Button = null;
+        private closeButton: Button = null;
+        private playerNameForm: Textbox = null;
+        private passwordForm: Textbox = null;
+        private playerlist: PlayerList = null;
+        private clickedEnterRoomEvent: (data) => void = () => { };
+
+        get RoomName(){
+            return this.room.Name;
+        }
+
+        get HasPassword(){
+            return this.room.HasPassword;
+        }
+
+        get Players() {
+            return this.room.Members;
+        }
+
+        get IsGenerated(): boolean {
+            return this.modal.IsGenerated;
+        }
+
+        set ClickedEnterRoomEvent(func: (data) => void) {
+            this.clickedEnterRoomEvent = func;
+        }
+
+        constructor(room: Room) {
+            super();
+            this.room = room;
+            this.unique = UniqueIdGenerater.Get().toString();
+            this.modal = new Modal();
+        }
+
+        public Generate(parent: JQuery) {
+            this.modal.Generate(parent);
+            this.reload();
+        }
+
+        public Show() {
+            this.modal.Show();
+        }
+
+        public Hide() {
+            this.modal.Hide();
+        }
+
+        private reload() {
+            this.modal.Title = this.RoomName;
+            // footer
+            this.closeButton = new Button();
+            this.closeButton.Text = "キャンセル";
+            this.closeButton.ClickedEvent = () => this.modal.Hide();
+            this.closeButton.Generate(this.modal.FooterObject);
+            this.enterButton = new Button();
+            this.enterButton.Style = ButtonStyle.primary;
+            this.enterButton.Text = "入室";
+            this.enterButton.ClickedEvent = () => this.clickedEnter();
+            this.enterButton.Generate(this.modal.FooterObject);
+            // body
+            this.playerNameForm = new Textbox(TextboxType.text, "", "プレイヤー名を入力してください。");
+            this.playerNameForm.Label = "プレイヤー名";
+            this.passwordForm = new Textbox(TextboxType.password, "", "パスワードを入力してください。");
+            this.passwordForm.Label = "パスワード";
+            if (!this.HasPassword) {
+                this.passwordForm.IsDisable = true;
+            }
+            this.playerNameForm.Generate(this.modal.BodyObject);
+            this.passwordForm.Generate(this.modal.BodyObject);
+            this.playerlist = new PlayerList();
+            this.room.Members.forEach(value => this.playerlist.addPlayer(value));
+            this.modal.BodyObject.append("在室プレイヤー");
+            this.playerlist.Generate(this.modal.BodyObject);
+        }
+
+        private clickedEnter() {
+
         }
     }
 }

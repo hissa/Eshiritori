@@ -27,4 +27,7 @@ rconnection.GetRooms(function (data) {
     });
     show();
 });
+var modal = new Components.RoomModal(new Components.Room("TestRoom", [new Components.Player("aaa", "hissa")], false));
+modal.Generate($("body"));
+modal.Show();
 //# sourceMappingURL=rooms.js.map
