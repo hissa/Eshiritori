@@ -35,9 +35,10 @@
         this.beEmptyEvent = func;
     }
 
-    constructor(roomId: string, roomName: string) {
+    constructor(roomId: string, roomName: string, password: string = null) {
         this.RoomName = roomName;
         this.roomId = roomId;
+        this.password = password;
     }
 
     public AddPlayer(player: Player) {

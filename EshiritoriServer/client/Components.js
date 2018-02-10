@@ -1056,11 +1056,12 @@ var Components;
     }(Component));
     Components.Button = Button;
     var Room = (function () {
-        function Room(name, members, hasPassword) {
+        function Room(roomId, name, members, hasPassword) {
             this.name = null;
             this.members = [];
             this.id = null;
             this.hasPassword = null;
+            this.id = roomId;
             this.name = name;
             this.members = members;
             this.hasPassword = hasPassword;
@@ -1086,6 +1087,13 @@ var Components;
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(Room.prototype, "Id", {
+            get: function () {
+                return this.id;
+            },
+            enumerable: true,
+            configurable: true
+        });
         return Room;
     }());
     Components.Room = Room;
@@ -1095,14 +1103,6 @@ var Components;
         TextboxType[TextboxType["password"] = 2] = "password";
     })(Components.TextboxType || (Components.TextboxType = {}));
     var TextboxType = Components.TextboxType;
-    ;
-    (function (InputStatus) {
-        InputStatus[InputStatus["none"] = 0] = "none";
-        InputStatus[InputStatus["success"] = 1] = "success";
-        InputStatus[InputStatus["warning"] = 2] = "warning";
-        InputStatus[InputStatus["danger"] = 3] = "danger";
-    })(Components.InputStatus || (Components.InputStatus = {}));
-    var InputStatus = Components.InputStatus;
     ;
     var Textbox = (function (_super) {
         __extends(Textbox, _super);
@@ -1463,6 +1463,9 @@ var Components;
             this.modal.BodyObject.append("在室プレイヤー");
             this.playerlist.Generate(this.modal.BodyObject);
         };
+        RoomModal.prototype.InvalidPassword = function () {
+            this.passwordForm.IsInvalid = true;
+        };
         RoomModal.prototype.clickedEnter = function () {
             this.playerNameForm.IsInvalid = false;
             if (this.playerNameForm.Value.length <= 0) {
@@ -1470,6 +1473,7 @@ var Components;
                 return;
             }
             this.clickedEnterRoomEvent({
+                playerName: this.playerNameForm.Value,
                 password: this.passwordForm.Value,
                 room: this.room
             });

@@ -117,10 +117,10 @@
             this.socket = io.connect("/");
         }
 
-        public EnterToNewRoom(roomName: string, playerName: string, callback: (data) => void) {
-            this.socket.emit("NewRoom", { roomName: roomName }, retData => {
+        public EnterToNewRoom(roomName: string, playerName: string, password = "", callback: (data) => void) {
+            this.socket.emit("NewRoom", { roomName: roomName, password: password}, retData => {
                 let roomId = retData.roomId;
-                this.socket.emit("EnterToRoom", { roomId: roomId, playerName: playerName }, retData2 => {
+                this.socket.emit("EnterToRoom", { roomId: roomId, playerName: playerName, password: password }, retData2 => {
                     callback(retData2);
                 });
             });
@@ -130,7 +130,8 @@
             this.socket.emit("GetRooms", {}, data => callback(data));
         }
 
-        public VerifyPassword(roomId: string, inputPassword: string, callback: (success: boolean) => void){
+        public VerifyPassword(roomId: string, inputPassword: string, callback: (success: boolean) => void) {
+            console.log(roomId);
             this.socket.emit("VerifyPassword", {
                 inputPassword: inputPassword,
                 roomId: roomId

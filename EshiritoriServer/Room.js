@@ -1,6 +1,7 @@
 "use strict";
 var Room = (function () {
-    function Room(roomId, roomName) {
+    function Room(roomId, roomName, password) {
+        if (password === void 0) { password = null; }
         this.roomName = null;
         this.members = [];
         this.password = null;
@@ -8,6 +9,7 @@ var Room = (function () {
         this.beEmptyEvent = function () { };
         this.RoomName = roomName;
         this.roomId = roomId;
+        this.password = password;
     }
     Object.defineProperty(Room.prototype, "RoomName", {
         get: function () {

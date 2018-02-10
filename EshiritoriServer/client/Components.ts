@@ -674,7 +674,7 @@ namespace Components {
             this.reload();
         }
 
-        set ClickedEnterRoomEvent(func: () => void) {
+        set ClickedEnterRoomEvent(func: (sender: Room) => void) {
             this.clickedEnterRoomEvent = func;
         }
 
@@ -912,7 +912,12 @@ namespace Components {
             return this.hasPassword;
         }
 
-        constructor(name: string, members: Player[], hasPassword: boolean) {
+        get Id(): string {
+            return this.id;
+        }
+
+        constructor(roomId: string, name: string, members: Player[], hasPassword: boolean) {
+            this.id = roomId;
             this.name = name;
             this.members = members;
             this.hasPassword = hasPassword;
@@ -923,13 +928,6 @@ namespace Components {
         text,
         email,
         password
-    };
-
-    export enum InputStatus {
-        none,
-        success,
-        warning,
-        danger
     };
 
     export class Textbox extends Component {
@@ -1227,6 +1225,10 @@ namespace Components {
             this.playerlist.Generate(this.modal.BodyObject);
         }
 
+        public InvalidPassword() {
+            this.passwordForm.IsInvalid = true;
+        }
+
         private clickedEnter() {
             this.playerNameForm.IsInvalid = false;
             if (this.playerNameForm.Value.length <= 0) {
@@ -1234,6 +1236,7 @@ namespace Components {
                 return;
             }
             this.clickedEnterRoomEvent({
+                playerName: this.playerNameForm.Value,
                 password: this.passwordForm.Value,
                 room: this.room
             });

@@ -31,11 +31,12 @@ io.sockets.on("connection", function (socket) {
         var ret = [];
         Object.keys(rooms).forEach(function (key) { return ret.push(rooms[key].ToHash()); });
         ack(ret);
-        console.log(ret);
+        //console.log(ret);
     });
     // 部屋の作成
     socket.on("NewRoom", function (data, ack) {
-        rooms[socket.id] = (new Rooms.Room(socket.id, data.roomName));
+        var pass = data.password == "" ? null : data.password;
+        rooms[socket.id] = (new Rooms.Room(socket.id, data.roomName, pass));
         rooms[socket.id].BeEmptyEvent = function () { return delete rooms[socket.id]; };
         ;
         ack({ roomId: rooms[socket.id].RoomId });
@@ -55,6 +56,11 @@ io.sockets.on("connection", function (socket) {
     // パスワードの認証
     socket.on("VerifyPassword", function (data, ack) {
         if (rooms[data.roomId] == undefined) {
+            console.log(data, rooms);
+            if (!rooms[data.roomId].HasPassword) {
+                ack({ success: true });
+                return;
+            }
             ack({ success: false });
             return;
         }

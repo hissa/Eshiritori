@@ -117,11 +117,12 @@ var Connections;
             enumerable: true,
             configurable: true
         });
-        Connection2.prototype.EnterToNewRoom = function (roomName, playerName, callback) {
+        Connection2.prototype.EnterToNewRoom = function (roomName, playerName, password, callback) {
             var _this = this;
-            this.socket.emit("NewRoom", { roomName: roomName }, function (retData) {
+            if (password === void 0) { password = ""; }
+            this.socket.emit("NewRoom", { roomName: roomName, password: password }, function (retData) {
                 var roomId = retData.roomId;
-                _this.socket.emit("EnterToRoom", { roomId: roomId, playerName: playerName }, function (retData2) {
+                _this.socket.emit("EnterToRoom", { roomId: roomId, playerName: playerName, password: password }, function (retData2) {
                     callback(retData2);
                 });
             });
@@ -130,6 +131,7 @@ var Connections;
             this.socket.emit("GetRooms", {}, function (data) { return callback(data); });
         };
         Connection2.prototype.VerifyPassword = function (roomId, inputPassword, callback) {
+            console.log(roomId);
             this.socket.emit("VerifyPassword", {
                 inputPassword: inputPassword,
                 roomId: roomId

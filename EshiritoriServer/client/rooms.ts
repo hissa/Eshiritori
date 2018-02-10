@@ -14,26 +14,60 @@ function show() {
     card.Generate($("#body"), "roomList");
     let table = new Components.RoomList();
     table.Rooms = rooms;
+    table.ClickedEnterRoomEvent = sender => {
+        modal = new Components.RoomModal(sender);
+        modal.Generate($("body"));
+        modal.ClickedEnterRoomEvent = data => {
+            if (!data.room.HasPassword) {
+                jump(data.room.Id, data.password, data.playerName);
+            }
+            rconnection.VerifyPassword(data.room.Id, data.password, success => {
+                if (success) {
+                    jump(data.room.Id, data.password, data.playerName);
+                }
+            })
+        };
+        modal.Show();
+    };
     table.Generate($("#cardpanelroomList"));
+}
+
+function jump(roomId: string, password: string, playerName: string) {
+    let query = `?roomId=${roomId}&password=${password}&playerName=${playerName}`;
+    window.location.href = "/index.html" + query;
 }
 
 let rooms: Components.Room[] = [];
 let rconnection = new Connections.Connection2();
-rconnection.GetRooms(data => {
-    data.forEach(value => {
-        let members: Components.Player[] = [];
-        value.members.forEach(player => {
-            members.push(new Components.Player(player.id, player.name));
+let modal: Components.RoomModal = null;
+rconnection.EnterToNewRoom("Testroom", "hissa", "hey",() => {
+    rconnection.GetRooms(data => {
+        data.forEach(value => {
+            let members: Components.Player[] = [];
+            value.members.forEach(player => {
+                members.push(new Components.Player(player.id, player.name));
+            });
+            rooms.push(new Components.Room(
+                value.id,
+                value.name,
+                members,
+                value.hasPassword
+            ));
         });
-        rooms.push(new Components.Room(
-            value.name,
-            members,
-            value.hasPassword
-        ));
+        show();
     });
-    show();
 });
-let modal = new Components.RoomModal(new Components.Room("TestRoom", [new Components.Player("aaa", "hissa")], false));
-modal.Generate($("body"));
-modal.ClickedEnterRoomEvent = data => console.log(data);
-modal.Show();
+//rconnection.GetRooms(data => {
+//    data.forEach(value => {
+//        let members: Components.Player[] = [];
+//        value.members.forEach(player => {
+//            members.push(new Components.Player(player.id, player.name));
+//        });
+//        rooms.push(new Components.Room(
+//            value.name,
+//            members,
+//            value.hasPassword
+//        ));
+//    });
+//    show();
+//});
