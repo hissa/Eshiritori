@@ -1242,4 +1242,83 @@ namespace Components {
             });
         }
     }
+
+    export class NewRoomModal extends Component {
+        private modal: Modal = null;
+        private unique: string = null;
+        private enterButton: Button = null;
+        private closeButton: Button = null;
+        private roomNameForm: Textbox = null;
+        private playerNameForm: Textbox = null;
+        private passwordForm: Textbox = null;;
+        private clickedEnterRoomEvent: (data) => void = () => { };
+
+        get IsGenerated(): boolean {
+            return this.modal.IsGenerated;
+        }
+
+        set ClickedEnterRoomEvent(func: (data) => void) {
+            this.clickedEnterRoomEvent = func;
+        }
+
+        constructor() {
+            super();
+            this.unique = UniqueIdGenerater.Get().toString();
+            this.modal = new Modal();
+        }
+
+        public Generate(parent: JQuery) {
+            this.modal.Generate(parent);
+            this.reload();
+        }
+
+        public Show() {
+            this.modal.Show();
+        }
+
+        public Hide() {
+            this.modal.Hide();
+        }
+
+        private reload() {
+            this.modal.Title = "新しい部屋の作成";
+            // footer
+            this.closeButton = new Button();
+            this.closeButton.Text = "キャンセル";
+            this.closeButton.ClickedEvent = () => this.modal.Hide();
+            this.closeButton.Generate(this.modal.FooterObject);
+            this.enterButton = new Button();
+            this.enterButton.Style = ButtonStyle.primary;
+            this.enterButton.Text = "作成";
+            this.enterButton.ClickedEvent = () => this.clickedEnter();
+            this.enterButton.Generate(this.modal.FooterObject);
+            // body
+            this.roomNameForm = new Textbox(TextboxType.text, "", "部屋名を入力してください。");
+            this.roomNameForm.Label = "部屋名";
+            this.playerNameForm = new Textbox(TextboxType.text, "", "あなたのプレイヤー名を入力してください。");
+            this.playerNameForm.Label = "プレイヤー名";
+            this.passwordForm = new Textbox(TextboxType.password, "", "パスワードを設定する場合は入力してください。");
+            this.passwordForm.Label = "パスワードを設定";
+            this.roomNameForm.Generate(this.modal.BodyObject);
+            this.playerNameForm.Generate(this.modal.BodyObject);
+            this.passwordForm.Generate(this.modal.BodyObject);
+        }
+
+        private clickedEnter() {
+            this.playerNameForm.IsInvalid = false;
+            this.roomNameForm.IsInvalid = false;
+            if (this.playerNameForm.Value.length <= 0) {
+                this.playerNameForm.IsInvalid = true;
+                return;
+            }
+            if (this.roomNameForm.Value.length <= 0) {
+                this.roomNameForm.IsInvalid = true;
+            }
+            this.clickedEnterRoomEvent({
+                playerName: this.playerNameForm.Value,
+                password: this.passwordForm.Value,
+                roomName: this.roomNameForm.Value
+            });
+        }
+    }
 }

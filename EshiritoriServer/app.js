@@ -31,7 +31,7 @@ io.sockets.on("connection", function (socket) {
         var ret = [];
         Object.keys(rooms).forEach(function (key) { return ret.push(rooms[key].ToHash()); });
         ack(ret);
-        //console.log(ret);
+        console.log(ret);
     });
     // 部屋の作成
     socket.on("NewRoom", function (data, ack) {
@@ -43,6 +43,7 @@ io.sockets.on("connection", function (socket) {
     });
     // 入室
     socket.on("EnterToRoom", function (data, ack) {
+        console.log(data);
         if (rooms[data.roomId] == undefined) {
             ack({ isSuccess: false });
             return;

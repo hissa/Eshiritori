@@ -1,26 +1,46 @@
-var Canvas = MyCanvas.Canvas;
-var Connection = Connections.Connection;
-var SocketEvent = Connections.SocketEvent;
-var Player = Connections.Player;
-var canvas = new Canvas(document.getElementById("canvas"));
-var connection = new Connection("http://localhost:11451");
-connection.setEventListener(SocketEvent.PlayerConnected, function (data) {
-    console.log(data.player.name + "\u304C\u5165\u5BA4");
-});
-connection.setEventListener(SocketEvent.PlayerDisconnected, function (data) {
-    console.log(data.player.name + "\u304C\u9000\u5BA4");
-});
-connection.setEventListener(SocketEvent.MessagePublished, function (data) {
-    console.log("[" + data.player.name + "]" + data.value);
-});
-connection.connect(new Player("hissa"));
-connection.publishMessage("hello");
-canvas.LineDrawedEvent = function (data) { return connection.draw(data); };
-connection.setEventListener(SocketEvent.LineDrawed, function (data) {
-    if (data.player.id == connection.Id)
-        return;
-    canvas.DrawByData(data.data);
-});
+//import Connection = Connections.Connection;
+//import SocketEvent = Connections.SocketEvent;
+//import Player = Connections.Player;
+//let canvas = new MyCanvas.Canvas(<HTMLCanvasElement>document.getElementById("canvas"));
+//let connection = new Connection("http://localhost:11451");
+//connection.setEventListener(SocketEvent.PlayerConnected, data => {
+//    console.log(`${data.player.name}が入室`);
+//});
+//connection.setEventListener(SocketEvent.PlayerDisconnected, data => {
+//    console.log(`${data.player.name}が退室`);
+//});
+//connection.setEventListener(SocketEvent.MessagePublished, data => {
+//    console.log(`[${data.player.name}]${data.value}`);
+//});
+//connection.connect(new Player("hissa"));
+//connection.publishMessage("hello");
+//canvas.LineDrawedEvent = data => connection.draw(data);
+//connection.setEventListener(SocketEvent.LineDrawed, data => {
+//    if (data.player.id == connection.Id) return;
+//    canvas.DrawByData(data.data);
+//});
+// クエリ文字列から変数を取得
+var queryStr = window.location.search;
+var values = [];
+var hash = queryStr.slice(1).split('&');
+for (var i = 0; i < hash.length; i++) {
+    var ary = hash[i].split("=");
+    values[ary[0]] = ary[1];
+}
+var connection = new Connections.Connection2();
+// 新しい部屋を作成しない場合
+if (values["newRoom"] == undefined) {
+    connection.EnterToRoom(values["roomId"], values["playerName"], values["password"], function (data) {
+        console.log(data);
+    });
+}
+else {
+    // 新しい部屋を作成する場合
+    connection.EnterToNewRoom(values["roomName"], values["playerName"], values["password"], function (data) {
+        console.log(data);
+    });
+}
+var canvas = new MyCanvas.Canvas(document.getElementById("canvas"));
 var toolbox = new Components.CardPanel();
 toolbox.HeaderText = "パレット";
 toolbox.Generate($("#toolBox"), "palet");
@@ -51,8 +71,8 @@ setTimeout(function () {
 }, 2000);
 var chatLog = new Components.ChatLog(10);
 chatLog.Generate($("#cardpanelContentchat"), "chatlog");
-for (var i = 0; i < 15; i++) {
-    chatLog.addMessage(new Components.ChatMessage("hissa", "hello" + i.toString()));
+for (var i_1 = 0; i_1 < 15; i_1++) {
+    chatLog.addMessage(new Components.ChatMessage("hissa", "hello" + i_1.toString()));
 }
 var chatinput = new Components.ChatInput();
 chatinput.Generate($("#cardpanelContentchat"), "chatinput");

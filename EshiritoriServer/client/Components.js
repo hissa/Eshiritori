@@ -403,8 +403,8 @@ var Components;
             if (start < 0)
                 start = 0;
             var end = this.messages.length - 1;
-            for (var i = start; i <= end; i++) {
-                this.object.append("<p>" + this.messages[i].Sender + ": " + this.messages[i].Message + "</p>");
+            for (var i_1 = start; i_1 <= end; i_1++) {
+                this.object.append("<p>" + this.messages[i_1].Sender + ": " + this.messages[i_1].Message + "</p>");
             }
         };
         return ChatLog;
@@ -1481,5 +1481,88 @@ var Components;
         return RoomModal;
     }(Component));
     Components.RoomModal = RoomModal;
+    var NewRoomModal = (function (_super) {
+        __extends(NewRoomModal, _super);
+        function NewRoomModal() {
+            _super.call(this);
+            this.modal = null;
+            this.unique = null;
+            this.enterButton = null;
+            this.closeButton = null;
+            this.roomNameForm = null;
+            this.playerNameForm = null;
+            this.passwordForm = null;
+            this.clickedEnterRoomEvent = function () { };
+            this.unique = UniqueIdGenerater.Get().toString();
+            this.modal = new Modal();
+        }
+        ;
+        Object.defineProperty(NewRoomModal.prototype, "IsGenerated", {
+            get: function () {
+                return this.modal.IsGenerated;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(NewRoomModal.prototype, "ClickedEnterRoomEvent", {
+            set: function (func) {
+                this.clickedEnterRoomEvent = func;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        NewRoomModal.prototype.Generate = function (parent) {
+            this.modal.Generate(parent);
+            this.reload();
+        };
+        NewRoomModal.prototype.Show = function () {
+            this.modal.Show();
+        };
+        NewRoomModal.prototype.Hide = function () {
+            this.modal.Hide();
+        };
+        NewRoomModal.prototype.reload = function () {
+            var _this = this;
+            this.modal.Title = "新しい部屋の作成";
+            // footer
+            this.closeButton = new Button();
+            this.closeButton.Text = "キャンセル";
+            this.closeButton.ClickedEvent = function () { return _this.modal.Hide(); };
+            this.closeButton.Generate(this.modal.FooterObject);
+            this.enterButton = new Button();
+            this.enterButton.Style = ButtonStyle.primary;
+            this.enterButton.Text = "作成";
+            this.enterButton.ClickedEvent = function () { return _this.clickedEnter(); };
+            this.enterButton.Generate(this.modal.FooterObject);
+            // body
+            this.roomNameForm = new Textbox(TextboxType.text, "", "部屋名を入力してください。");
+            this.roomNameForm.Label = "部屋名";
+            this.playerNameForm = new Textbox(TextboxType.text, "", "あなたのプレイヤー名を入力してください。");
+            this.playerNameForm.Label = "プレイヤー名";
+            this.passwordForm = new Textbox(TextboxType.password, "", "パスワードを設定する場合は入力してください。");
+            this.passwordForm.Label = "パスワードを設定";
+            this.roomNameForm.Generate(this.modal.BodyObject);
+            this.playerNameForm.Generate(this.modal.BodyObject);
+            this.passwordForm.Generate(this.modal.BodyObject);
+        };
+        NewRoomModal.prototype.clickedEnter = function () {
+            this.playerNameForm.IsInvalid = false;
+            this.roomNameForm.IsInvalid = false;
+            if (this.playerNameForm.Value.length <= 0) {
+                this.playerNameForm.IsInvalid = true;
+                return;
+            }
+            if (this.roomNameForm.Value.length <= 0) {
+                this.roomNameForm.IsInvalid = true;
+            }
+            this.clickedEnterRoomEvent({
+                playerName: this.playerNameForm.Value,
+                password: this.passwordForm.Value,
+                roomName: this.roomNameForm.Value
+            });
+        };
+        return NewRoomModal;
+    }(Component));
+    Components.NewRoomModal = NewRoomModal;
 })(Components || (Components = {}));
 //# sourceMappingURL=Components.js.map

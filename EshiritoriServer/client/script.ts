@@ -1,25 +1,49 @@
-﻿import Canvas = MyCanvas.Canvas;
-import Connection = Connections.Connection;
-import SocketEvent = Connections.SocketEvent;
-import Player = Connections.Player;
-let canvas = new Canvas(<HTMLCanvasElement>document.getElementById("canvas"));
-let connection = new Connection("http://localhost:11451");
-connection.setEventListener(SocketEvent.PlayerConnected, data => {
-    console.log(`${data.player.name}が入室`);
-});
-connection.setEventListener(SocketEvent.PlayerDisconnected, data => {
-    console.log(`${data.player.name}が退室`);
-});
-connection.setEventListener(SocketEvent.MessagePublished, data => {
-    console.log(`[${data.player.name}]${data.value}`);
-});
-connection.connect(new Player("hissa"));
-connection.publishMessage("hello");
-canvas.LineDrawedEvent = data => connection.draw(data);
-connection.setEventListener(SocketEvent.LineDrawed, data => {
-    if (data.player.id == connection.Id) return;
-    canvas.DrawByData(data.data);
-});
+﻿//import Connection = Connections.Connection;
+//import SocketEvent = Connections.SocketEvent;
+//import Player = Connections.Player;
+//let canvas = new MyCanvas.Canvas(<HTMLCanvasElement>document.getElementById("canvas"));
+//let connection = new Connection("http://localhost:11451");
+//connection.setEventListener(SocketEvent.PlayerConnected, data => {
+//    console.log(`${data.player.name}が入室`);
+//});
+//connection.setEventListener(SocketEvent.PlayerDisconnected, data => {
+//    console.log(`${data.player.name}が退室`);
+//});
+//connection.setEventListener(SocketEvent.MessagePublished, data => {
+//    console.log(`[${data.player.name}]${data.value}`);
+//});
+//connection.connect(new Player("hissa"));
+//connection.publishMessage("hello");
+//canvas.LineDrawedEvent = data => connection.draw(data);
+//connection.setEventListener(SocketEvent.LineDrawed, data => {
+//    if (data.player.id == connection.Id) return;
+//    canvas.DrawByData(data.data);
+//});
+
+// クエリ文字列から変数を取得
+let queryStr = window.location.search;
+let values = [];
+let hash = queryStr.slice(1).split('&');
+for (var i = 0; i < hash.length; i++) {
+    let ary = hash[i].split("=");
+    values[ary[0]] = ary[1];
+}
+
+let connection = new Connections.Connection2();
+
+// 新しい部屋を作成しない場合
+if (values["newRoom"] == undefined) {
+    connection.EnterToRoom(values["roomId"], values["playerName"], values["password"], data => {
+        console.log(data);
+    });
+} else {
+    // 新しい部屋を作成する場合
+    connection.EnterToNewRoom(values["roomName"], values["playerName"], values["password"], data => {
+        console.log(data);
+    });
+}
+
+let canvas = new MyCanvas.Canvas(<HTMLCanvasElement>document.getElementById("canvas"));
 
 let toolbox = new Components.CardPanel();
 toolbox.HeaderText = "パレット";

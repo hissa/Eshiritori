@@ -126,12 +126,15 @@
             });
         }
 
+        public EnterToRoom(roomId: string, playerName: string, password = "", callback: (data) => void) {
+            this.socket.emit("EnterToRoom", { roomId: roomId, playerName: playerName, password: password }, data => callback(data));
+        }
+
         public GetRooms(callback: (data) => void){
             this.socket.emit("GetRooms", {}, data => callback(data));
         }
 
         public VerifyPassword(roomId: string, inputPassword: string, callback: (success: boolean) => void) {
-            console.log(roomId);
             this.socket.emit("VerifyPassword", {
                 inputPassword: inputPassword,
                 roomId: roomId

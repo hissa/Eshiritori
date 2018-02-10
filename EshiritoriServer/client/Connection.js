@@ -127,11 +127,14 @@ var Connections;
                 });
             });
         };
+        Connection2.prototype.EnterToRoom = function (roomId, playerName, password, callback) {
+            if (password === void 0) { password = ""; }
+            this.socket.emit("EnterToRoom", { roomId: roomId, playerName: playerName, password: password }, function (data) { return callback(data); });
+        };
         Connection2.prototype.GetRooms = function (callback) {
             this.socket.emit("GetRooms", {}, function (data) { return callback(data); });
         };
         Connection2.prototype.VerifyPassword = function (roomId, inputPassword, callback) {
-            console.log(roomId);
             this.socket.emit("VerifyPassword", {
                 inputPassword: inputPassword,
                 roomId: roomId
