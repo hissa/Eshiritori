@@ -98,6 +98,7 @@ var Connections;
     }());
     Connections.Connection = Connection;
     (function (Connection2Event) {
+        Connection2Event[Connection2Event["RoomsUpdated"] = 0] = "RoomsUpdated";
     })(Connections.Connection2Event || (Connections.Connection2Event = {}));
     var Connection2Event = Connections.Connection2Event;
     ;
@@ -139,6 +140,9 @@ var Connections;
                 inputPassword: inputPassword,
                 roomId: roomId
             }, function (data) { return callback(data.success); });
+        };
+        Connection2.prototype.AddEventListener = function (event, func) {
+            this.socket.on(Connection2Event[event], func);
         };
         return Connection2;
     }());

@@ -45,6 +45,10 @@ function show() {
         modal.Show();
     };
     table.Generate($("#cardpanelroomList"));
+    rconnection.AddEventListener(Connections.Connection2Event.RoomsUpdated, data => {
+        UpdateRooms(data);
+        table.Rooms = rooms;
+    })
 }
 
 function jump(roomId: string, password: string, playerName: string) {
@@ -55,6 +59,22 @@ function jump(roomId: string, password: string, playerName: string) {
 function jumpNewRoom(roomName: string, password: string, playerName: string) {
     let query = `?roomName=${roomName}&password=${password}&playerName=${playerName}&newRoom=true`;
     window.location.href = "/index.html" + query;
+}
+
+function UpdateRooms(data) {
+    rooms = [];
+    data.forEach(value => {
+        let members: Components.Player[] = [];
+        value.members.forEach(player => {
+            members.push(new Components.Player(player.id, player.name));
+        });
+        rooms.push(new Components.Room(
+            value.id,
+            value.name,
+            members,
+            value.hasPassword
+        ));
+    });
 }
 
 let rooms: Components.Room[] = [];
@@ -78,18 +98,20 @@ let modal: Components.RoomModal = null;
 //    });
 //});
 rconnection.GetRooms(data => {
-    data.forEach(value => {
-        let members: Components.Player[] = [];
-        value.members.forEach(player => {
-            members.push(new Components.Player(player.id, player.name));
-        });
-        // constructor(roomId: string, name: string, members: Player[], hasPassword: boolean) {
-        rooms.push(new Components.Room(
-            value.id,
-            value.name,
-            members,
-            value.hasPassword
-        ));
-    });
+    //data.forEach(value => {
+    //    let members: Components.Player[] = [];
+    //    value.members.forEach(player => {
+    //        members.push(new Components.Player(player.id, player.name));
+    //    });
+    //    // constructor(roomId: string, name: string, members: Player[], hasPassword: boolean) {
+    //    rooms.push(new Components.Room(
+    //        value.id,
+    //        value.name,
+    //        members,
+    //        value.hasPassword
+    //    ));
+    //});
+    //show();
+    UpdateRooms(data);
     show();
 });

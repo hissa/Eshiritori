@@ -99,7 +99,7 @@
     }
 
     export enum Connection2Event {
-
+        RoomsUpdated
     };
 
     export class Connection2 {
@@ -139,6 +139,10 @@
                 inputPassword: inputPassword,
                 roomId: roomId
             }, data => callback(data.success));
+        }
+
+        public AddEventListener(event: Connection2Event, func: (data) => void) {
+            this.socket.on(Connection2Event[event], func);
         }
     }
 }

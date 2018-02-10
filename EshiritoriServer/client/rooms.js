@@ -45,6 +45,10 @@ function show() {
         modal.Show();
     };
     table.Generate($("#cardpanelroomList"));
+    rconnection.AddEventListener(Connections.Connection2Event.RoomsUpdated, function (data) {
+        UpdateRooms(data);
+        table.Rooms = rooms;
+    });
 }
 function jump(roomId, password, playerName) {
     var query = "?roomId=" + roomId + "&password=" + password + "&playerName=" + playerName;
@@ -53,6 +57,16 @@ function jump(roomId, password, playerName) {
 function jumpNewRoom(roomName, password, playerName) {
     var query = "?roomName=" + roomName + "&password=" + password + "&playerName=" + playerName + "&newRoom=true";
     window.location.href = "/index.html" + query;
+}
+function UpdateRooms(data) {
+    rooms = [];
+    data.forEach(function (value) {
+        var members = [];
+        value.members.forEach(function (player) {
+            members.push(new Components.Player(player.id, player.name));
+        });
+        rooms.push(new Components.Room(value.id, value.name, members, value.hasPassword));
+    });
 }
 var rooms = [];
 var rconnection = new Connections.Connection2();
@@ -75,14 +89,21 @@ var modal = null;
 //    });
 //});
 rconnection.GetRooms(function (data) {
-    data.forEach(function (value) {
-        var members = [];
-        value.members.forEach(function (player) {
-            members.push(new Components.Player(player.id, player.name));
-        });
-        // constructor(roomId: string, name: string, members: Player[], hasPassword: boolean) {
-        rooms.push(new Components.Room(value.id, value.name, members, value.hasPassword));
-    });
+    //data.forEach(value => {
+    //    let members: Components.Player[] = [];
+    //    value.members.forEach(player => {
+    //        members.push(new Components.Player(player.id, player.name));
+    //    });
+    //    // constructor(roomId: string, name: string, members: Player[], hasPassword: boolean) {
+    //    rooms.push(new Components.Room(
+    //        value.id,
+    //        value.name,
+    //        members,
+    //        value.hasPassword
+    //    ));
+    //});
+    //show();
+    UpdateRooms(data);
     show();
 });
 //# sourceMappingURL=rooms.js.map

@@ -23,7 +23,14 @@ app.get("/", (req, res) => {
 const io = socketio.listen(server);
 
 let users = {};
-let rooms:Rooms.Room[] = [];
+let rooms: Rooms.Room[] = [];
+// 部屋の状況が更新された
+function UpdateRooms() {
+    let ret = [];
+    Object.keys(rooms).forEach(key => ret.push(rooms[key].ToHash()));
+    io.sockets.emit("RoomsUpdated", ret);
+}
+
 io.sockets.on("connection", socket => {
     console.log("Player connected.");
 
@@ -45,6 +52,7 @@ io.sockets.on("connection", socket => {
         rooms[socket.id] = (new Rooms.Room(socket.id, data.roomName, pass));
         rooms[socket.id].BeEmptyEvent = () => delete rooms[socket.id]; ;
         ack({ roomId: rooms[socket.id].RoomId });
+        UpdateRooms();
     });
 
     // 入室
@@ -59,6 +67,7 @@ io.sockets.on("connection", socket => {
         ack({
             isSuccess: true
         });
+        UpdateRooms();
     });
 
     // パスワードの認証
@@ -82,6 +91,7 @@ io.sockets.on("connection", socket => {
         // 全ての部屋に対して、このプレイヤーをRemoveするよう試みる。
         Object.keys(rooms).forEach(key => rooms[key].RemovePlayer(socket.id));
         console.log("Player disconnected.");
+        UpdateRooms();
     });
 
 
