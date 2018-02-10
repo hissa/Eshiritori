@@ -35,4 +35,5 @@ rconnection.GetRooms(data => {
 });
 let modal = new Components.RoomModal(new Components.Room("TestRoom", [new Components.Player("aaa", "hissa")], false));
 modal.Generate($("body"));
+modal.ClickedEnterRoomEvent = data => console.log(data);
 modal.Show();

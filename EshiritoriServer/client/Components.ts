@@ -939,7 +939,7 @@ namespace Components {
         private default: string = "";
         private type: TextboxType = TextboxType.text;
         private label: string = "";
-        private status: InputStatus = InputStatus.none;
+        private isInvalid = false;
         private isDisable = false;
         private groupObject: JQuery = null;
         private inputObject: JQuery = null;
@@ -967,12 +967,19 @@ namespace Components {
             }
         }
 
-        get Status(): InputStatus {
-            return this.status;
+        get IsInvalid(): boolean {
+            return this.isInvalid;
         }
-        set Status(value: InputStatus) {
-            this.status = value;
+        set IsInvalid(value: boolean) {
+            this.isInvalid = value;
             this.reloadStatus();
+        }
+
+        get Value(): string {
+            return this.inputObject.val();
+        }
+        set Value(value: string) {
+            this.inputObject.val(value);
         }
 
         get Placeholder(): string {
@@ -1009,6 +1016,7 @@ namespace Components {
             this.groupObject.addClass("form-group");
             this.labelObject.attr({ "for": `textbox${this.unique}input` });
             this.labelObject.text(this.label);
+            this.labelObject.addClass("form-control-label");
             this.inputObject.addClass("form-control");
             this.inputObject.attr({ "type": TextboxType[this.type] });
             this.inputObject.attr({ "placeholder": this.placeholder });
@@ -1022,9 +1030,9 @@ namespace Components {
 
         private reloadStatus() {
             if (!this.IsGenerated) return;
-            this.groupObject.removeClass("has-success has-warning has-danger");
-            if (this.Status == InputStatus.none) return;
-            this.groupObject.addClass(`has-${InputStatus[this.Status]}`);
+            this.inputObject.removeClass("is-invalid");
+            if (!this.IsInvalid) return;
+            this.inputObject.addClass("is-invalid");
         }
     }
 
@@ -1220,7 +1228,15 @@ namespace Components {
         }
 
         private clickedEnter() {
-
+            this.playerNameForm.IsInvalid = false;
+            if (this.playerNameForm.Value.length <= 0) {
+                this.playerNameForm.IsInvalid = true;
+                return;
+            }
+            this.clickedEnterRoomEvent({
+                password: this.passwordForm.Value,
+                room: this.room
+            });
         }
     }
 }

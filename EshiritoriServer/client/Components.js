@@ -1117,7 +1117,7 @@ var Components;
             this.default = "";
             this.type = TextboxType.text;
             this.label = "";
-            this.status = InputStatus.none;
+            this.isInvalid = false;
             this.isDisable = false;
             this.groupObject = null;
             this.inputObject = null;
@@ -1157,13 +1157,23 @@ var Components;
             enumerable: true,
             configurable: true
         });
-        Object.defineProperty(Textbox.prototype, "Status", {
+        Object.defineProperty(Textbox.prototype, "IsInvalid", {
             get: function () {
-                return this.status;
+                return this.isInvalid;
             },
             set: function (value) {
-                this.status = value;
+                this.isInvalid = value;
                 this.reloadStatus();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(Textbox.prototype, "Value", {
+            get: function () {
+                return this.inputObject.val();
+            },
+            set: function (value) {
+                this.inputObject.val(value);
             },
             enumerable: true,
             configurable: true
@@ -1207,6 +1217,7 @@ var Components;
             this.groupObject.addClass("form-group");
             this.labelObject.attr({ "for": "textbox" + this.unique + "input" });
             this.labelObject.text(this.label);
+            this.labelObject.addClass("form-control-label");
             this.inputObject.addClass("form-control");
             this.inputObject.attr({ "type": TextboxType[this.type] });
             this.inputObject.attr({ "placeholder": this.placeholder });
@@ -1220,10 +1231,10 @@ var Components;
         Textbox.prototype.reloadStatus = function () {
             if (!this.IsGenerated)
                 return;
-            this.groupObject.removeClass("has-success has-warning has-danger");
-            if (this.Status == InputStatus.none)
+            this.inputObject.removeClass("is-invalid");
+            if (!this.IsInvalid)
                 return;
-            this.groupObject.addClass("has-" + InputStatus[this.Status]);
+            this.inputObject.addClass("is-invalid");
         };
         return Textbox;
     }(Component));
@@ -1453,6 +1464,15 @@ var Components;
             this.playerlist.Generate(this.modal.BodyObject);
         };
         RoomModal.prototype.clickedEnter = function () {
+            this.playerNameForm.IsInvalid = false;
+            if (this.playerNameForm.Value.length <= 0) {
+                this.playerNameForm.IsInvalid = true;
+                return;
+            }
+            this.clickedEnterRoomEvent({
+                password: this.passwordForm.Value,
+                room: this.room
+            });
         };
         return RoomModal;
     }(Component));

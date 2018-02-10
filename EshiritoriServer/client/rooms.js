@@ -29,5 +29,6 @@ rconnection.GetRooms(function (data) {
 });
 var modal = new Components.RoomModal(new Components.Room("TestRoom", [new Components.Player("aaa", "hissa")], false));
 modal.Generate($("body"));
+modal.ClickedEnterRoomEvent = function (data) { return console.log(data); };
 modal.Show();
 //# sourceMappingURL=rooms.js.map
