@@ -922,6 +922,17 @@ namespace Components {
             this.members = members;
             this.hasPassword = hasPassword;
         }
+
+        public static Parse(roomData) {
+            let members = [];
+            roomData.members.forEach(value => members.push(new Player(value.id, value.name)));
+            return new Room(
+                roomData.id,
+                roomData.name,
+                members,
+                roomData.hasPassword
+            );
+        }
     }
 
     export enum TextboxType {

@@ -28,22 +28,44 @@ for (var i = 0; i < hash.length; i++) {
     let ary = hash[i].split("=");
     values[ary[0]] = ary[1];
 }
+// urlのクエリ文字列を消す
+history.pushState(null, null, "/index.html");
 
 let connection = new Connections.Connection2();
+
+let myRoom = null;
+let canvas = new MyCanvas.Canvas(<HTMLCanvasElement>document.getElementById("canvas"));
 
 // 新しい部屋を作成しない場合
 if (values["newRoom"] == undefined) {
     connection.EnterToRoom(values["roomId"], values["playerName"], values["password"], data => {
         console.log(data);
+        myRoom = Components.Room.Parse(data.room);
+        canvas.ShowImage(data.canvasImage);
+        console.log(myRoom);
     });
 } else {
     // 新しい部屋を作成する場合
     connection.EnterToNewRoom(values["roomName"], values["playerName"], values["password"], data => {
         console.log(data);
+        myRoom = Components.Room.Parse(data.room);
+        console.log(myRoom);
     });
 }
-
-let canvas = new MyCanvas.Canvas(<HTMLCanvasElement>document.getElementById("canvas"));
+canvas.LineDrawedEvent = data => connection.SubmitDrawing(data, myRoom.Id);
+connection.AddEventListener(Connections.Connection2Event.Drawed, data => {
+    canvas.DrawByData(data);
+});
+connection.AddEventListener(Connections.Connection2Event.ReportCanvas, (data, ack) => {
+    ack({
+        image: canvas.CanvasElement.toDataURL()
+    });
+});
+//canvas.LineDrawedEvent = data => connection.draw(data);
+//connection.setEventListener(SocketEvent.LineDrawed, data => {
+//    if (data.player.id == connection.Id) return;
+//    canvas.DrawByData(data.data);
+//});
 
 let toolbox = new Components.CardPanel();
 toolbox.HeaderText = "パレット";

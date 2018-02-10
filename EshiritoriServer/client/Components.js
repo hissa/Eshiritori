@@ -1094,6 +1094,11 @@ var Components;
             enumerable: true,
             configurable: true
         });
+        Room.Parse = function (roomData) {
+            var members = [];
+            roomData.members.forEach(function (value) { return members.push(new Player(value.id, value.name)); });
+            return new Room(roomData.id, roomData.name, members, roomData.hasPassword);
+        };
         return Room;
     }());
     Components.Room = Room;

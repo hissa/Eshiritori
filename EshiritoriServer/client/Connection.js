@@ -99,6 +99,8 @@ var Connections;
     Connections.Connection = Connection;
     (function (Connection2Event) {
         Connection2Event[Connection2Event["RoomsUpdated"] = 0] = "RoomsUpdated";
+        Connection2Event[Connection2Event["Drawed"] = 1] = "Drawed";
+        Connection2Event[Connection2Event["ReportCanvas"] = 2] = "ReportCanvas";
     })(Connections.Connection2Event || (Connections.Connection2Event = {}));
     var Connection2Event = Connections.Connection2Event;
     ;
@@ -140,6 +142,12 @@ var Connections;
                 inputPassword: inputPassword,
                 roomId: roomId
             }, function (data) { return callback(data.success); });
+        };
+        Connection2.prototype.SubmitDrawing = function (data, roomId) {
+            this.socket.emit("Draw", {
+                data: data,
+                roomId: roomId
+            });
         };
         Connection2.prototype.AddEventListener = function (event, func) {
             this.socket.on(Connection2Event[event], func);

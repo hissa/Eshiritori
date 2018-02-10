@@ -65,6 +65,13 @@ var MyCanvas;
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(Canvas.prototype, "CanvasElement", {
+            get: function () {
+                return this.canvas;
+            },
+            enumerable: true,
+            configurable: true
+        });
         /**
          * 渡されたデータから描画します。
          * @param data データ
@@ -78,6 +85,16 @@ var MyCanvas;
             this.ctx.lineTo(data.point.x, data.point.y);
             this.ctx.stroke();
             this.ctx.closePath();
+        };
+        /**
+         * DataUrlから描画します。
+         * @param image DataURL
+         */
+        Canvas.prototype.ShowImage = function (image) {
+            var _this = this;
+            var img = new Image();
+            img.src = image;
+            img.onload = function () { return _this.ctx.drawImage(img, 0, 0); };
         };
         Canvas.prototype.addEventListeners = function () {
             var _this = this;

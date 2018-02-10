@@ -27,20 +27,42 @@ for (var i = 0; i < hash.length; i++) {
     var ary = hash[i].split("=");
     values[ary[0]] = ary[1];
 }
+// urlのクエリ文字列を消す
+history.pushState(null, null, "/index.html");
 var connection = new Connections.Connection2();
+var myRoom = null;
+var canvas = new MyCanvas.Canvas(document.getElementById("canvas"));
 // 新しい部屋を作成しない場合
 if (values["newRoom"] == undefined) {
     connection.EnterToRoom(values["roomId"], values["playerName"], values["password"], function (data) {
         console.log(data);
+        myRoom = Components.Room.Parse(data.room);
+        canvas.ShowImage(data.canvasImage);
+        console.log(myRoom);
     });
 }
 else {
     // 新しい部屋を作成する場合
     connection.EnterToNewRoom(values["roomName"], values["playerName"], values["password"], function (data) {
         console.log(data);
+        myRoom = Components.Room.Parse(data.room);
+        console.log(myRoom);
     });
 }
-var canvas = new MyCanvas.Canvas(document.getElementById("canvas"));
+canvas.LineDrawedEvent = function (data) { return connection.SubmitDrawing(data, myRoom.Id); };
+connection.AddEventListener(Connections.Connection2Event.Drawed, function (data) {
+    canvas.DrawByData(data);
+});
+connection.AddEventListener(Connections.Connection2Event.ReportCanvas, function (data, ack) {
+    ack({
+        image: canvas.CanvasElement.toDataURL()
+    });
+});
+//canvas.LineDrawedEvent = data => connection.draw(data);
+//connection.setEventListener(SocketEvent.LineDrawed, data => {
+//    if (data.player.id == connection.Id) return;
+//    canvas.DrawByData(data.data);
+//});
 var toolbox = new Components.CardPanel();
 toolbox.HeaderText = "パレット";
 toolbox.Generate($("#toolBox"), "palet");

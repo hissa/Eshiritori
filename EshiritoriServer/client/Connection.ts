@@ -99,7 +99,9 @@
     }
 
     export enum Connection2Event {
-        RoomsUpdated
+        RoomsUpdated,
+        Drawed,
+        ReportCanvas
     };
 
     export class Connection2 {
@@ -141,7 +143,14 @@
             }, data => callback(data.success));
         }
 
-        public AddEventListener(event: Connection2Event, func: (data) => void) {
+        public SubmitDrawing(data, roomId: string) {
+            this.socket.emit("Draw", {
+                data: data,
+                roomId: roomId
+            });
+        }
+
+        public AddEventListener(event: Connection2Event, func: (data, ack?) => void) {
             this.socket.on(Connection2Event[event], func);
         }
     }

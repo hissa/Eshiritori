@@ -27,6 +27,13 @@ function UpdateRooms() {
     Object.keys(rooms).forEach(function (key) { return ret.push(rooms[key].ToHash()); });
     io.sockets.emit("RoomsUpdated", ret);
 }
+// キャンバスの状態が欲しい
+function SearchCanvas(roomId, callback) {
+    var targetId = rooms[roomId].Members[0].Id;
+    io.sockets.connected[targetId].emit("ReportCanvas", {}, function (data) {
+        callback(data);
+    });
+}
 io.sockets.on("connection", function (socket) {
     console.log("Player connected.");
     //
@@ -50,17 +57,32 @@ io.sockets.on("connection", function (socket) {
     });
     // 入室
     socket.on("EnterToRoom", function (data, ack) {
-        console.log(data);
         if (rooms[data.roomId] == undefined) {
             ack({ isSuccess: false });
             return;
         }
-        rooms[data.roomId].AddPlayer(new Rooms.Player(socket.id, data.playerName));
-        // TODO: 部屋の情報を返す
-        ack({
-            isSuccess: true
-        });
-        UpdateRooms();
+        var canvasImage;
+        if (rooms[data.roomId].Members.length > 0) {
+            SearchCanvas(data.roomId, function (canvasData) {
+                rooms[data.roomId].AddPlayer(new Rooms.Player(socket.id, data.playerName));
+                socket.join(data.roomId);
+                ack({
+                    isSuccess: true,
+                    room: rooms[data.roomId].ToHash(),
+                    canvasImage: canvasData.image
+                });
+            });
+        }
+        else {
+            rooms[data.roomId].AddPlayer(new Rooms.Player(socket.id, data.playerName));
+            socket.join(data.roomId);
+            // TODO: 部屋の情報を返す
+            ack({
+                isSuccess: true,
+                room: rooms[data.roomId].ToHash()
+            });
+            UpdateRooms();
+        }
     });
     // パスワードの認証
     socket.on("VerifyPassword", function (data, ack) {
@@ -83,6 +105,10 @@ io.sockets.on("connection", function (socket) {
         Object.keys(rooms).forEach(function (key) { return rooms[key].RemovePlayer(socket.id); });
         console.log("Player disconnected.");
         UpdateRooms();
+    });
+    // 線が描かれた
+    socket.on("Draw", function (data) {
+        socket.broadcast.to(data.roomId).emit("Drawed", data.data);
     });
     //// プレイヤーが接続
     //socket.on("Connected", name => {

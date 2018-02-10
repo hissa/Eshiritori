@@ -43,6 +43,10 @@
             this.lineDrawedEvent = func;
         }
 
+        get CanvasElement(): HTMLCanvasElement {
+            return this.canvas;
+        }
+
         /**
          * Canvasクラスのコンストラクター
          * @param canvas 対象のHTMLのCanvas要素
@@ -70,6 +74,16 @@
             this.ctx.lineTo(data.point.x, data.point.y);
             this.ctx.stroke();
             this.ctx.closePath();
+        }
+
+        /**
+         * DataUrlから描画します。
+         * @param image DataURL
+         */
+        public ShowImage(image: string) {
+            let img = new Image();
+            img.src = image;
+            img.onload = () => this.ctx.drawImage(img, 0, 0);
         }
 
         private addEventListeners() {
