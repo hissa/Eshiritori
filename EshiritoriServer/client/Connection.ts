@@ -101,7 +101,8 @@
     export enum Connection2Event {
         RoomsUpdated,
         Drawed,
-        ReportCanvas
+        ReportCanvas,
+        RoomUpdated
     };
 
     export class Connection2 {

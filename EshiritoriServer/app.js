@@ -21,7 +21,7 @@ app.get("/", function (req, res) {
 var io = socketio.listen(server);
 var users = {};
 var rooms = [];
-// 部屋の状況が更新された
+// 部屋リストの状況が更新された
 function UpdateRooms() {
     var ret = [];
     Object.keys(rooms).forEach(function (key) { return ret.push(rooms[key].ToHash()); });
@@ -33,6 +33,10 @@ function SearchCanvas(roomId, callback) {
     io.sockets.connected[targetId].emit("ReportCanvas", {}, function (data) {
         callback(data);
     });
+}
+// 部屋が更新された
+function MyRoomUpdated(roomId) {
+    io.in(roomId).emit("RoomUpdated", { room: rooms[roomId].ToHash() });
 }
 io.sockets.on("connection", function (socket) {
     console.log("Player connected.");
@@ -62,9 +66,10 @@ io.sockets.on("connection", function (socket) {
             return;
         }
         var canvasImage;
+        rooms[data.roomId].AddPlayer(new Rooms.Player(socket.id, data.playerName));
         if (rooms[data.roomId].Members.length > 0) {
             SearchCanvas(data.roomId, function (canvasData) {
-                rooms[data.roomId].AddPlayer(new Rooms.Player(socket.id, data.playerName));
+                //rooms[data.roomId].AddPlayer(new Rooms.Player(socket.id, data.playerName));
                 socket.join(data.roomId);
                 ack({
                     isSuccess: true,
@@ -74,7 +79,7 @@ io.sockets.on("connection", function (socket) {
             });
         }
         else {
-            rooms[data.roomId].AddPlayer(new Rooms.Player(socket.id, data.playerName));
+            //rooms[data.roomId].AddPlayer(new Rooms.Player(socket.id, data.playerName));
             socket.join(data.roomId);
             // TODO: 部屋の情報を返す
             ack({
@@ -83,6 +88,7 @@ io.sockets.on("connection", function (socket) {
             });
             UpdateRooms();
         }
+        MyRoomUpdated(data.roomId);
     });
     // パスワードの認証
     socket.on("VerifyPassword", function (data, ack) {
@@ -101,9 +107,19 @@ io.sockets.on("connection", function (socket) {
     });
     // 切断
     socket.on("disconnect", function () {
+        // プレイヤーがいた部屋を特定して更新イベントを投げる
+        var targetRoomId = null;
+        Object.keys(rooms).forEach(function (key) {
+            if (rooms[key].hasPlayer(socket.id)) {
+                targetRoomId = key;
+            }
+        });
         // 全ての部屋に対して、このプレイヤーをRemoveするよう試みる。
         Object.keys(rooms).forEach(function (key) { return rooms[key].RemovePlayer(socket.id); });
         console.log("Player disconnected.");
+        if (targetRoomId != null && rooms[targetRoomId] != undefined) {
+            MyRoomUpdated(targetRoomId);
+        }
         UpdateRooms();
     });
     // 線が描かれた

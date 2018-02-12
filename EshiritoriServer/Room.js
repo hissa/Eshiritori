@@ -7,6 +7,8 @@ var Room = (function () {
         this.password = null;
         this.roomId = null;
         this.beEmptyEvent = function () { };
+        // membersのインデックス
+        this.turn = 0;
         this.RoomName = roomName;
         this.roomId = roomId;
         this.password = password;
@@ -59,6 +61,41 @@ var Room = (function () {
         enumerable: true,
         configurable: true
     });
+    Object.defineProperty(Room.prototype, "Turn", {
+        get: function () {
+            return this.turn;
+        },
+        set: function (value) {
+            this.turn = value % this.members.length - 1;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Room.prototype, "TurnPlayer", {
+        get: function () {
+            return this.Members[this.Turn];
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(Room.prototype, "TurnPlayerId", {
+        set: function (id) {
+            var _this = this;
+            var success = false;
+            this.members.forEach(function (value, index) {
+                if (value.Id == id) {
+                    _this.Turn = index;
+                    success = true;
+                }
+            });
+            if (!success) {
+                // やめて
+                console.log("has error at set TurnPlayerId().");
+            }
+        },
+        enumerable: true,
+        configurable: true
+    });
     Room.prototype.AddPlayer = function (player) {
         this.members.push(player);
     };
@@ -85,8 +122,21 @@ var Room = (function () {
             name: this.RoomName,
             members: membersHash,
             hasPassword: this.HasPassword,
-            id: this.RoomId
+            id: this.RoomId,
+            turnPlayer: this.members.length > 0 ? this.TurnPlayer.ToHash() : null
         };
+    };
+    Room.prototype.addTurn = function () {
+        this.Turn = this.Turn + 1;
+    };
+    Room.prototype.hasPlayer = function (id) {
+        var ret = false;
+        this.members.forEach(function (value) {
+            if (value.Id == id) {
+                ret = true;
+            }
+        });
+        return ret;
     };
     return Room;
 }());

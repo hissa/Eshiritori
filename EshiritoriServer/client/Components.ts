@@ -262,6 +262,7 @@ namespace Components {
         }
 
         private reload() {
+            console.log("playerlist reloaded");
             if (!this.IsGenerated) return;
             this.tbodyObject.empty();
             this.nameCellObjects = [];
@@ -276,6 +277,12 @@ namespace Components {
                     current.addClass("table-danger");
                 }
             });
+        }
+
+        public replacePlayers(players: Player[]) {
+            console.log(players);
+            this.players = players;
+            this.reload();
         }
     }
 
@@ -899,6 +906,7 @@ namespace Components {
         private members: Player[] = [];
         private id: string = null;
         private hasPassword: boolean = null;
+        private currentPlayer: Player;
 
         get Name(): string {
             return this.name;
@@ -916,6 +924,13 @@ namespace Components {
             return this.id;
         }
 
+        get CurrentPlayer(): Player {
+            return this.currentPlayer;
+        }
+        set CurrentPlayer(value: Player) {
+            this.currentPlayer = value;
+        }
+
         constructor(roomId: string, name: string, members: Player[], hasPassword: boolean) {
             this.id = roomId;
             this.name = name;
@@ -926,12 +941,14 @@ namespace Components {
         public static Parse(roomData) {
             let members = [];
             roomData.members.forEach(value => members.push(new Player(value.id, value.name)));
-            return new Room(
+            let ret =  new Room(
                 roomData.id,
                 roomData.name,
                 members,
                 roomData.hasPassword
             );
+            ret.CurrentPlayer = new Player(roomData.turnPlayer.id, roomData.turnPlayer.name);
+            return ret;
         }
     }
 

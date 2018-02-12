@@ -101,6 +101,7 @@ var Connections;
         Connection2Event[Connection2Event["RoomsUpdated"] = 0] = "RoomsUpdated";
         Connection2Event[Connection2Event["Drawed"] = 1] = "Drawed";
         Connection2Event[Connection2Event["ReportCanvas"] = 2] = "ReportCanvas";
+        Connection2Event[Connection2Event["RoomUpdated"] = 3] = "RoomUpdated";
     })(Connections.Connection2Event || (Connections.Connection2Event = {}));
     var Connection2Event = Connections.Connection2Event;
     ;

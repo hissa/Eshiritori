@@ -303,6 +303,7 @@ var Components;
         };
         PlayerList.prototype.reload = function () {
             var _this = this;
+            console.log("playerlist reloaded");
             if (!this.IsGenerated)
                 return;
             this.tbodyObject.empty();
@@ -318,6 +319,11 @@ var Components;
                     current.addClass("table-danger");
                 }
             });
+        };
+        PlayerList.prototype.replacePlayers = function (players) {
+            console.log(players);
+            this.players = players;
+            this.reload();
         };
         return PlayerList;
     }(Component));
@@ -1094,10 +1100,22 @@ var Components;
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(Room.prototype, "CurrentPlayer", {
+            get: function () {
+                return this.currentPlayer;
+            },
+            set: function (value) {
+                this.currentPlayer = value;
+            },
+            enumerable: true,
+            configurable: true
+        });
         Room.Parse = function (roomData) {
             var members = [];
             roomData.members.forEach(function (value) { return members.push(new Player(value.id, value.name)); });
-            return new Room(roomData.id, roomData.name, members, roomData.hasPassword);
+            var ret = new Room(roomData.id, roomData.name, members, roomData.hasPassword);
+            ret.CurrentPlayer = new Player(roomData.turnPlayer.id, roomData.turnPlayer.name);
+            return ret;
         };
         return Room;
     }());

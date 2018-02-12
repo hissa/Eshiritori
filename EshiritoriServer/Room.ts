@@ -4,6 +4,8 @@
     private password: string = null;
     private roomId: string = null;
     private beEmptyEvent: (sender: Room) => void = () => { };
+    // membersのインデックス
+    private turn: number = 0;
 
     get RoomName(): string {
         return this.roomName;
@@ -33,6 +35,30 @@
 
     set BeEmptyEvent(func: (sender: Room) => void) {
         this.beEmptyEvent = func;
+    }
+
+    get Turn(): number {
+        return this.turn;
+    }
+    set Turn(value: number) {
+        this.turn = value % this.members.length - 1;
+    }
+
+    get TurnPlayer(): Player {
+        return this.Members[this.Turn];
+    }
+    set TurnPlayerId(id: string) {
+        let success = false;
+        this.members.forEach((value, index) => {
+            if (value.Id == id) {
+                this.Turn = index;
+                success = true;
+            }
+        });
+        if (!success) {
+            // やめて
+            console.log("has error at set TurnPlayerId().");
+        }
     }
 
     constructor(roomId: string, roomName: string, password: string = null) {
@@ -69,8 +95,23 @@
             name: this.RoomName,
             members: membersHash,
             hasPassword: this.HasPassword,
-            id: this.RoomId
+            id: this.RoomId,
+            turnPlayer: this.members.length > 0 ? this.TurnPlayer.ToHash() : null
         };
+    }
+
+    public addTurn() {
+        this.Turn = this.Turn + 1;
+    }
+
+    public hasPlayer(id: string) {
+        let ret = false;
+        this.members.forEach(value => {
+            if (value.Id == id) {
+                ret = true;
+            }
+        });
+        return ret;
     }
 }
 

@@ -33,7 +33,7 @@ history.pushState(null, null, "/index.html");
 
 let connection = new Connections.Connection2();
 
-let myRoom = null;
+let myRoom: Components.Room = null;
 let canvas = new MyCanvas.Canvas(<HTMLCanvasElement>document.getElementById("canvas"));
 
 // 新しい部屋を作成しない場合
@@ -41,6 +41,7 @@ if (values["newRoom"] == undefined) {
     connection.EnterToRoom(values["roomId"], values["playerName"], values["password"], data => {
         console.log(data);
         myRoom = Components.Room.Parse(data.room);
+        UpdateRoomStatus();
         canvas.ShowImage(data.canvasImage);
         console.log(myRoom);
     });
@@ -49,6 +50,7 @@ if (values["newRoom"] == undefined) {
     connection.EnterToNewRoom(values["roomName"], values["playerName"], values["password"], data => {
         console.log(data);
         myRoom = Components.Room.Parse(data.room);
+        UpdateRoomStatus();
         console.log(myRoom);
     });
 }
@@ -61,6 +63,16 @@ connection.AddEventListener(Connections.Connection2Event.ReportCanvas, (data, ac
         image: canvas.CanvasElement.toDataURL()
     });
 });
+connection.AddEventListener(Connections.Connection2Event.RoomUpdated, data => {
+    myRoom = Components.Room.Parse(data.room);
+    console.log(myRoom);
+    UpdateRoomStatus();
+});
+
+function UpdateRoomStatus() {
+    playerList.CurrentPlayer = myRoom.CurrentPlayer;
+    playerList.replacePlayers(myRoom.Members);
+}
 //canvas.LineDrawedEvent = data => connection.draw(data);
 //connection.setEventListener(SocketEvent.LineDrawed, data => {
 //    if (data.player.id == connection.Id) return;
@@ -84,17 +96,17 @@ let infoBar = new Components.InfomationBar();
 infoBar.Generate($("#yourTurn"), "yourturn");
 infoBar.InformationType = Components.InformationType.YourTurn;
 let playerList = new Components.PlayerList();
-playerList.addPlayer(new Components.Player("aaa", "hissa"));
-playerList.addPlayer(new Components.Player("bbb", "shieru"));
-playerList.addPlayer(new Components.Player("ccc", "drizzle"));
-playerList.CurrentPlayer = new Components.Player("bbb", "shieru");
+//playerList.addPlayer(new Components.Player("aaa", "hissa"));
+//playerList.addPlayer(new Components.Player("bbb", "shieru"));
+//playerList.addPlayer(new Components.Player("ccc", "drizzle"));
+//playerList.CurrentPlayer = new Components.Player("bbb", "shieru");
 playerList.Generate($("#cardpanelContentplayers"), "playerlist");
-setTimeout(() => {
-    playerList.addPlayer(new Components.Player("ddd", "alicia"));
-}, 1000);
-setTimeout(() => {
-    playerList.CurrentPlayer = new Components.Player("aaa", "hissa");
-}, 2000);
+//setTimeout(() => {
+//    playerList.addPlayer(new Components.Player("ddd", "alicia"));
+//}, 1000);
+//setTimeout(() => {
+//    playerList.CurrentPlayer = new Components.Player("aaa", "hissa");
+//}, 2000);
 let chatLog = new Components.ChatLog(10);
 chatLog.Generate($("#cardpanelContentchat"), "chatlog");
 for (let i = 0; i < 15; i++) {
