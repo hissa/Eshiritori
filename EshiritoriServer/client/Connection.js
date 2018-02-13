@@ -103,6 +103,7 @@ var Connections;
         Connection2Event[Connection2Event["ReportCanvas"] = 2] = "ReportCanvas";
         Connection2Event[Connection2Event["RoomUpdated"] = 3] = "RoomUpdated";
         Connection2Event[Connection2Event["TurnAdd"] = 4] = "TurnAdd";
+        Connection2Event[Connection2Event["connect"] = 5] = "connect";
     })(Connections.Connection2Event || (Connections.Connection2Event = {}));
     var Connection2Event = Connections.Connection2Event;
     ;

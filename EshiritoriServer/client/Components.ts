@@ -71,6 +71,18 @@ namespace Components {
             return this.hasFooter;
         }
 
+        get HeaderObject(): JQuery {
+            return this.headerObject;
+        }
+
+        get BodyObject(): JQuery {
+            return this.contentObject;
+        }
+
+        get FooterObject(): JQuery {
+            return this.footerObject;
+        }
+
         /**
          * コンストラクター
          * @param header ヘッダーのテキスト
@@ -262,7 +274,6 @@ namespace Components {
         }
 
         private reload() {
-            console.log("playerlist reloaded");
             if (!this.IsGenerated) return;
             this.tbodyObject.empty();
             this.nameCellObjects = [];
@@ -280,7 +291,6 @@ namespace Components {
         }
 
         public replacePlayers(players: Player[]) {
-            console.log(players);
             this.players = players;
             this.reload();
         }
@@ -308,7 +318,7 @@ namespace Components {
          */
         constructor(id: string, name: string) {
             this.id = id;
-            this.name = name;
+            this.name = decodeURI(name);
         }
     }
 
@@ -941,7 +951,7 @@ namespace Components {
 
         constructor(roomId: string, name: string, members: Player[], hasPassword: boolean) {
             this.id = roomId;
-            this.name = name;
+            this.name = decodeURI(name);
             this.members = members;
             this.hasPassword = hasPassword;
         }
@@ -951,7 +961,7 @@ namespace Components {
             roomData.members.forEach(value => members.push(new Player(value.id, value.name)));
             let ret =  new Room(
                 roomData.id,
-                roomData.name,
+                decodeURI(roomData.name),
                 members,
                 roomData.hasPassword
             );

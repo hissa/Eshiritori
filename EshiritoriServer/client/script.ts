@@ -1,152 +1,190 @@
-﻿//import Connection = Connections.Connection;
-//import SocketEvent = Connections.SocketEvent;
-//import Player = Connections.Player;
-//let canvas = new MyCanvas.Canvas(<HTMLCanvasElement>document.getElementById("canvas"));
-//let connection = new Connection("http://localhost:11451");
-//connection.setEventListener(SocketEvent.PlayerConnected, data => {
-//    console.log(`${data.player.name}が入室`);
-//});
-//connection.setEventListener(SocketEvent.PlayerDisconnected, data => {
-//    console.log(`${data.player.name}が退室`);
-//});
-//connection.setEventListener(SocketEvent.MessagePublished, data => {
-//    console.log(`[${data.player.name}]${data.value}`);
-//});
-//connection.connect(new Player("hissa"));
-//connection.publishMessage("hello");
-//canvas.LineDrawedEvent = data => connection.draw(data);
-//connection.setEventListener(SocketEvent.LineDrawed, data => {
-//    if (data.player.id == connection.Id) return;
-//    canvas.DrawByData(data.data);
-//});
+﻿abstract class MainPage {
+    // 普通の変数
+    protected player: Components.Player = null;
+    protected queryValues = null;
+    protected connection: Connections.Connection2 = null;
+    protected myRoom: Components.Room = null;
+    protected doneLoad = false;
+    protected defaultImage: string = null;
+    // コンポーネント
+    protected toolboxPanel: Components.CardPanel = null; // 未実装
+    protected chatPanel: Components.CardPanel = null;
+    protected playersPanel: Components.CardPanel = null;
+    protected drawLogsPanel: Components.CardPanel = null;
+    protected chatLog: Components.ChatLog = null;
+    protected chatInput: Components.ChatInput = null;
+    protected infoBar: Components.InfomationBar = null;
+    protected playerList: Components.PlayerList = null;
+    protected doneButton: Components.Button = null;
+    protected canvas: MyCanvas.Canvas = null;
+    // イベント
+    protected onload: () => void = () => { };
 
-// クエリ文字列から変数を取得
-let queryStr = window.location.search;
-let values = [];
-let hash = queryStr.slice(1).split('&');
-for (var i = 0; i < hash.length; i++) {
-    let ary = hash[i].split("=");
-    values[ary[0]] = ary[1];
-}
-// urlのクエリ文字列を消す
-history.pushState(null, null, "/index.html");
+    // イベントのアクセサ
+    set Onload(func: () => void) {
+        this.onload = func;
+    }
 
-let connection = new Connections.Connection2();
+    // アクセサ
+    set MyRoom(value: Components.Room) {
+        this.myRoom = value;
+        this.Update();
+    }
 
-let myRoom: Components.Room = null;
-let canvas = new MyCanvas.Canvas(<HTMLCanvasElement>document.getElementById("canvas"));
+    static Factory(): MainPage {
+        let ret = null;
+        let values = MainPage.getQueryValues();
+        if (values["newRoom"] != undefined) {
+            ret = new NewRoomPage();
+        } else {
+            ret = new ExistingRoomPage();
+        }
+        return ret;
+    }
 
-// 新しい部屋を作成しない場合
-if (values["newRoom"] == undefined) {
-    connection.EnterToRoom(values["roomId"], values["playerName"], values["password"], data => {
-        console.log(data);
-        myRoom = Components.Room.Parse(data.room);
-        UpdateRoomStatus();
-        canvas.ShowImage(data.canvasImage);
-        console.log(myRoom);
-    });
-} else {
-    // 新しい部屋を作成する場合
-    connection.EnterToNewRoom(values["roomName"], values["playerName"], values["password"], data => {
-        console.log(data);
-        myRoom = Components.Room.Parse(data.room);
-        UpdateRoomStatus();
-        console.log(myRoom);
-    });
-}
-canvas.LineDrawedEvent = data => connection.SubmitDrawing(data, myRoom.Id);
-connection.AddEventListener(Connections.Connection2Event.Drawed, data => {
-    canvas.DrawByData(data);
-});
-connection.AddEventListener(Connections.Connection2Event.ReportCanvas, (data, ack) => {
-    ack({
-        image: canvas.CanvasElement.toDataURL()
-    });
-});
-connection.AddEventListener(Connections.Connection2Event.RoomUpdated, data => {
-    myRoom = Components.Room.Parse(data.room);
-    console.log(myRoom);
-    UpdateRoomStatus();
-});
-connection.AddEventListener(Connections.Connection2Event.TurnAdd, data => {
-    console.log(data.room);
-    myRoom = Components.Room.Parse(data.room);
-    UpdateRoomStatus();
-    this.canvas.Clear();
-});
+    constructor() {
+        this.queryValues = MainPage.getQueryValues();
+        MainPage.removeQueryString();        
+        this.connection = new Connections.Connection2();
+        this.connection.AddEventListener(Connections.Connection2Event.connect, () => {
+            this.player = new Components.Player(this.connection.SocketId, this.queryValues["playerName"]);
+            this.EnterRoom(() => {
+                this.MakeComponents();
+                if (this.defaultImage != null) {
+                    this.canvas.ShowImage(this.defaultImage);
+                }
+                this.addEventListeners();
+            });
+        });
+    }
 
-function UpdateRoomStatus() {
-    playerList.CurrentPlayer = myRoom.CurrentPlayer;
-    playerList.replacePlayers(myRoom.Members);
-    //infoBar.InformationType =
-    //    myRoom.CurrentPlayer.Id == connection.SocketId ?
-    //        Components.InformationType.YourTurn : Components.InformationType.None;
-    if (myRoom.CurrentPlayer.Id == connection.SocketId) {
-        infoBar.InformationType = Components.InformationType.YourTurn;
-        doneButton.Show();     
-    } else {
-        infoBar.InformationType = Components.InformationType.None;
-        doneButton.Hide();
+    protected abstract EnterRoom(callback: () => void);
+
+    protected MakeComponents() {
+        this.canvas = new MyCanvas.Canvas(<HTMLCanvasElement>document.getElementById("canvas"));
+
+        this.toolboxPanel = new Components.CardPanel();
+        this.toolboxPanel.HeaderText = "パレット";
+        this.toolboxPanel.Generate($("#toolBox"), "palet");
+
+        this.chatPanel = new Components.CardPanel();
+        this.chatPanel.HeaderText = "チャット";
+        this.chatPanel.Generate($("#chat"), "chat");
+
+        this.playersPanel = new Components.CardPanel();
+        this.playersPanel.HeaderText = "プレイヤー";
+        this.playersPanel.Generate($("#playerList"), "players");
+
+        this.drawLogsPanel = new Components.CardPanel();
+        this.drawLogsPanel.HeaderText = "ログ";
+        this.drawLogsPanel.ContentText = "ここに過去の絵を表示";
+        this.drawLogsPanel.Generate($("#drawlog"), "drawlog");
+
+        this.infoBar = new Components.InfomationBar();
+        this.infoBar.Generate($("#yourTurn"), "yourturn");
+
+        this.playerList = new Components.PlayerList();
+        this.playerList.Generate(this.playersPanel.BodyObject, "playerlist");
+
+        this.chatLog = new Components.ChatLog(10);
+        this.chatLog.Generate(this.chatPanel.BodyObject, "chatlog");
+
+        this.chatInput = new Components.ChatInput();
+        this.chatInput.Generate(this.chatPanel.BodyObject, "chatinput");
+
+        this.doneButton = new Components.Button();
+        this.doneButton.Style = Components.ButtonStyle.primary;
+        this.doneButton.Size = Components.ButtonSize.Large;
+        this.doneButton.Text = "完了";
+        this.doneButton.Generate($("#yourTurn"), "done");
+
+        this.doneLoad = true;
+        this.Update();
+    }
+
+    protected addEventListeners() {
+        this.connection.AddEventListener(Connections.Connection2Event.Drawed, data => this.canvas.DrawByData(data));
+        this.connection.AddEventListener(Connections.Connection2Event.ReportCanvas, (data, ack) => {
+            ack({
+                image: this.canvas.CanvasElement.toDataURL()
+            });
+        });
+        this.connection.AddEventListener(Connections.Connection2Event.RoomUpdated, data => {
+            this.MyRoom = Components.Room.Parse(data.room);
+        });
+        this.connection.AddEventListener(Connections.Connection2Event.TurnAdd, data => {
+            this.MyRoom = Components.Room.Parse(data.room);
+            this.canvas.Clear();
+        });
+
+        this.canvas.LineDrawedEvent = data => this.connection.SubmitDrawing(data, this.myRoom.Id);
+    }
+
+    private Update() {
+        if (!this.doneLoad) return;
+        this.playerList.CurrentPlayer = this.myRoom.CurrentPlayer;
+        this.playerList.replacePlayers(this.myRoom.Members);
+        console.log(this.myRoom, this.player);
+        if (this.myRoom.CurrentPlayer.Id == this.player.Id) {
+            this.infoBar.InformationType = Components.InformationType.YourTurn;
+            this.doneButton.Show();
+        } else {
+            this.infoBar.InformationType = Components.InformationType.None;
+            this.doneButton.Hide();
+        }
+    }
+
+    static getQueryValues() {
+        let queryStr = window.location.search;
+        let values = [];
+        let hash = queryStr.slice(1).split('&');
+        for (var i = 0; i < hash.length; i++) {
+            let ary = hash[i].split("=");
+            values[ary[0]] = ary[1];
+        }
+        return values;
+    }
+
+    static removeQueryString() {
+        history.pushState(null, null, "/index.html");
     }
 }
-//canvas.LineDrawedEvent = data => connection.draw(data);
-//connection.setEventListener(SocketEvent.LineDrawed, data => {
-//    if (data.player.id == connection.Id) return;
-//    canvas.DrawByData(data.data);
-//});
 
-let toolbox = new Components.CardPanel();
-toolbox.HeaderText = "パレット";
-toolbox.Generate($("#toolBox"), "palet");
-let chat = new Components.CardPanel();
-chat.HeaderText = "チャット";
-chat.Generate($("#chat"), "chat");
-let playerListBox = new Components.CardPanel();
-playerListBox.HeaderText = "プレイヤーリスト";
-playerListBox.Generate($("#playerList"), "players");
-let drawlog = new Components.CardPanel();
-drawlog.HeaderText = "ログ";
-drawlog.ContentText = "ここに過去の絵たちを表示";
-drawlog.Generate($("#drawlog"), "drawlog");
-let infoBar = new Components.InfomationBar();
-infoBar.Generate($("#yourTurn"), "yourturn");
-infoBar.InformationType = Components.InformationType.YourTurn;
-let playerList = new Components.PlayerList();
-//playerList.addPlayer(new Components.Player("aaa", "hissa"));
-//playerList.addPlayer(new Components.Player("bbb", "shieru"));
-//playerList.addPlayer(new Components.Player("ccc", "drizzle"));
-//playerList.CurrentPlayer = new Components.Player("bbb", "shieru");
-playerList.Generate($("#cardpanelContentplayers"), "playerlist");
-//setTimeout(() => {
-//    playerList.addPlayer(new Components.Player("ddd", "alicia"));
-//}, 1000);
-//setTimeout(() => {
-//    playerList.CurrentPlayer = new Components.Player("aaa", "hissa");
-//}, 2000);
-let chatLog = new Components.ChatLog(10);
-chatLog.Generate($("#cardpanelContentchat"), "chatlog");
-for (let i = 0; i < 15; i++) {
-    chatLog.addMessage(new Components.ChatMessage("hissa", "hello" + i.toString()));
-}
-let chatinput = new Components.ChatInput();
-chatinput.Generate($("#cardpanelContentchat"), "chatinput");
-chatinput.SendMessageEvent = msg => console.log(msg);
-let colorBox = new Components.ColorBox(100, 30, "red");
-colorBox.Generate($("#cardpanelContentpalet"));
-colorBox.ClickedEvent = e => console.log("clicked");
-let penSizeSelector = new Components.PenSizeSelector([1, 5, 10, 20]);
-let penSizeSample = new Components.PenSizeSample(100, 100);
-penSizeSelector.Generate($("#cardpanelContentpalet"));
-penSizeSample.Generate($("#cardpanelContentpalet"));
-penSizeSelector.SelectedEvent = value => penSizeSample.PenSize = value;
-let doneButton = new Components.Button();
-doneButton.Style = Components.ButtonStyle.primary;
-doneButton.Size = Components.ButtonSize.Large;
-doneButton.Text = "完了";
-doneButton.Generate($("#yourTurn"), "done");
-doneButton.ClickedEvent = () => {
-    let res = confirm("完了しますか？");
-    if (res) {
-        connection.DoneDrawing(myRoom.Id);
+class ExistingRoomPage extends MainPage {
+    private roomId = "";
+    private password = "";
+
+    constructor() {
+        super();
+    }
+
+    protected EnterRoom(callback = () => { }) {
+        this.roomId = this.queryValues["roomId"];
+        this.password = this.queryValues["password"];
+        this.connection.EnterToRoom(this.roomId, this.player.Name, this.password, data => {
+            this.MyRoom = Components.Room.Parse(data.room);
+            callback();
+        });
     }
 }
+
+class NewRoomPage extends MainPage {
+    private roomName = "";
+    private password = "";
+    private roomId = "";
+
+    constructor() {
+        super();
+    }
+
+    protected EnterRoom(callback = () => { }) {
+        this.roomName = this.queryValues["roomName"];
+        this.password = this.queryValues["password"];
+        this.connection.EnterToNewRoom(this.roomName, this.player.Name, this.password, data => {
+            this.MyRoom = Components.Room.Parse(data.room);
+            callback();
+        });
+    }
+}
+
+let page = MainPage.Factory();

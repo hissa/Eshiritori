@@ -14,6 +14,7 @@
         private point: Point;
         private isDrawing: boolean;
         private pen: Pen;
+        private canDraw: boolean;
         // イベント
         private lineDrawedEvent: (data: any) => void = () => { };
 
@@ -45,6 +46,13 @@
 
         get CanvasElement(): HTMLCanvasElement {
             return this.canvas;
+        }
+
+        get CanDraw(): boolean {
+            return this.canDraw;
+        }
+        set CanDraw(value: boolean) {
+            this.canDraw = value;
         }
 
         /**
@@ -101,6 +109,7 @@
 
         private mouseMove(e: MouseEvent) {
             if (!this.isDrawing) return;
+            if (!this.canDraw) return;
             let target = <HTMLElement>e.target;
             let rect = target.getBoundingClientRect();
             this.point = new Point(e.clientX - rect.left, e.clientY - rect.top);

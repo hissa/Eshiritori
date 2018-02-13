@@ -113,6 +113,27 @@ var Components;
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(CardPanel.prototype, "HeaderObject", {
+            get: function () {
+                return this.headerObject;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CardPanel.prototype, "BodyObject", {
+            get: function () {
+                return this.contentObject;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(CardPanel.prototype, "FooterObject", {
+            get: function () {
+                return this.footerObject;
+            },
+            enumerable: true,
+            configurable: true
+        });
         /**
          * 指定された親要素にコンポーネントを追加します。
          * @param parent 追加する親要素
@@ -303,7 +324,6 @@ var Components;
         };
         PlayerList.prototype.reload = function () {
             var _this = this;
-            console.log("playerlist reloaded");
             if (!this.IsGenerated)
                 return;
             this.tbodyObject.empty();
@@ -321,7 +341,6 @@ var Components;
             });
         };
         PlayerList.prototype.replacePlayers = function (players) {
-            console.log(players);
             this.players = players;
             this.reload();
         };
@@ -339,7 +358,7 @@ var Components;
          */
         function Player(id, name) {
             this.id = id;
-            this.name = name;
+            this.name = decodeURI(name);
         }
         Object.defineProperty(Player.prototype, "Id", {
             get: function () {
@@ -409,8 +428,8 @@ var Components;
             if (start < 0)
                 start = 0;
             var end = this.messages.length - 1;
-            for (var i_1 = start; i_1 <= end; i_1++) {
-                this.object.append("<p>" + this.messages[i_1].Sender + ": " + this.messages[i_1].Message + "</p>");
+            for (var i = start; i <= end; i++) {
+                this.object.append("<p>" + this.messages[i].Sender + ": " + this.messages[i].Message + "</p>");
             }
         };
         return ChatLog;
@@ -1074,7 +1093,7 @@ var Components;
             this.id = null;
             this.hasPassword = null;
             this.id = roomId;
-            this.name = name;
+            this.name = decodeURI(name);
             this.members = members;
             this.hasPassword = hasPassword;
         }
@@ -1119,7 +1138,7 @@ var Components;
         Room.Parse = function (roomData) {
             var members = [];
             roomData.members.forEach(function (value) { return members.push(new Player(value.id, value.name)); });
-            var ret = new Room(roomData.id, roomData.name, members, roomData.hasPassword);
+            var ret = new Room(roomData.id, decodeURI(roomData.name), members, roomData.hasPassword);
             ret.CurrentPlayer = new Player(roomData.turnPlayer.id, roomData.turnPlayer.name);
             return ret;
         };

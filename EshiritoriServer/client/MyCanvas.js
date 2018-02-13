@@ -72,6 +72,16 @@ var MyCanvas;
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(Canvas.prototype, "CanDraw", {
+            get: function () {
+                return this.canDraw;
+            },
+            set: function (value) {
+                this.canDraw = value;
+            },
+            enumerable: true,
+            configurable: true
+        });
         /**
          * 渡されたデータから描画します。
          * @param data データ
@@ -110,6 +120,8 @@ var MyCanvas;
         };
         Canvas.prototype.mouseMove = function (e) {
             if (!this.isDrawing)
+                return;
+            if (!this.canDraw)
                 return;
             var target = e.target;
             var rect = target.getBoundingClientRect();

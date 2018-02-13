@@ -103,7 +103,8 @@
         Drawed,
         ReportCanvas,
         RoomUpdated,
-        TurnAdd
+        TurnAdd,
+        connect
     };
 
     export class Connection2 {

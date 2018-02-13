@@ -80,11 +80,11 @@ io.sockets.on("connection", socket => {
             return;
         }
         let canvasImage;
-        rooms[data.roomId].AddPlayer(new Rooms.Player(socket.id, data.playerName));
         if (rooms[data.roomId].Members.length > 0) {
             SearchCanvas(data.roomId, (canvasData) => {
                 //rooms[data.roomId].AddPlayer(new Rooms.Player(socket.id, data.playerName));
                 socket.join(data.roomId);
+                rooms[data.roomId].AddPlayer(new Rooms.Player(socket.id, data.playerName));
                 ack({
                     isSuccess: true,
                     room: rooms[data.roomId].ToHash(),
@@ -94,6 +94,7 @@ io.sockets.on("connection", socket => {
         } else {
             //rooms[data.roomId].AddPlayer(new Rooms.Player(socket.id, data.playerName));
             socket.join(data.roomId);
+            rooms[data.roomId].AddPlayer(new Rooms.Player(socket.id, data.playerName));
             // TODO: 部屋の情報を返す
             ack({
                 isSuccess: true,
