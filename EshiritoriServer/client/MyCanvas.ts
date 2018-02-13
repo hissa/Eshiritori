@@ -86,6 +86,13 @@
             img.onload = () => this.ctx.drawImage(img, 0, 0);
         }
 
+        /**
+         * キャンバスをクリアします。
+         */
+        public Clear() {
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        }
+
         private addEventListeners() {
             this.canvas.addEventListener("mousemove", e => this.mouseMove(e));
             this.canvas.addEventListener("mousedown", e => this.mouseDown(e));

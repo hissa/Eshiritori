@@ -41,7 +41,7 @@
         return this.turn;
     }
     set Turn(value: number) {
-        this.turn = value % this.members.length - 1;
+        this.turn = value % this.members.length;
     }
 
     get TurnPlayer(): Player {
@@ -83,6 +83,9 @@
         }
         if (this.Members.length <= 0) {
             this.beEmptyEvent(this);
+        }
+        if (this.members.length - 1 > this.Turn) {
+            this.Turn = 0;
         }
     }
 

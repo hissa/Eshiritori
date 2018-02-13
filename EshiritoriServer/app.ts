@@ -44,6 +44,11 @@ function MyRoomUpdated(roomId) {
     io.in(roomId).emit("RoomUpdated", { room: rooms[roomId].ToHash() });
 }
 
+// ターンが更新された
+function TurnUpdate(roomId) {
+    io.in(roomId).emit("TurnAdd", { room: rooms[roomId].ToHash() });
+}
+
 io.sockets.on("connection", socket => {
     console.log("Player connected.");
 
@@ -94,8 +99,8 @@ io.sockets.on("connection", socket => {
                 isSuccess: true,
                 room: rooms[data.roomId].ToHash()
             });
-            UpdateRooms();
         }
+        UpdateRooms();
         MyRoomUpdated(data.roomId);
     });
 
@@ -118,10 +123,15 @@ io.sockets.on("connection", socket => {
     // 切断
     socket.on("disconnect", () => {
         // プレイヤーがいた部屋を特定して更新イベントを投げる
-        let targetRoomId:string = null;
+        // そのプレイヤーの手番だった場合手番更新イベントも投げる
+        let targetRoomId: string = null;
+        let turnUpdate: boolean = false;
         Object.keys(rooms).forEach(key => {
             if (rooms[key].hasPlayer(socket.id)) {
                 targetRoomId = key;
+                if (rooms[key].TurnPlayer.Id == socket.id) {
+                    turnUpdate = true;
+                }
             }
         });
         // 全ての部屋に対して、このプレイヤーをRemoveするよう試みる。
@@ -130,6 +140,9 @@ io.sockets.on("connection", socket => {
 
         if (targetRoomId != null && rooms[targetRoomId] != undefined) {
             MyRoomUpdated(targetRoomId);
+            if (turnUpdate) {
+                TurnUpdate(targetRoomId);
+            }
         }
         UpdateRooms();
     });
@@ -137,6 +150,12 @@ io.sockets.on("connection", socket => {
     // 線が描かれた
     socket.on("Draw", data => {
         socket.broadcast.to(data.roomId).emit("Drawed", data.data);
+    });
+
+    // お絵かき完了、手番進む
+    socket.on("DoneDrawing", data => {
+        rooms[data.roomId].addTurn();
+        TurnUpdate(data.roomId);
     });
 
 

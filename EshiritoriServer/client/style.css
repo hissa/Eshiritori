@@ -75,4 +75,11 @@ div {
 
 #informationbaryourturn{
     text-align: center;
+    padding-right: 0;
+    width: 88%;
+    float: left;
+}
+
+#buttondone{
+    margin-right: 0;
 }

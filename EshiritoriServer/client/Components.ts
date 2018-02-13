@@ -848,6 +848,14 @@ namespace Components {
             this.reload();
         }
 
+        public Show() {
+            this.object.show();
+        }
+
+        public Hide() {
+            this.object.hide();
+        }
+
         private reload() {
             if (!this.isGenerated) return;
             this.clear();

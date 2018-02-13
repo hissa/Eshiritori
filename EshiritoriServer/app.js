@@ -38,6 +38,10 @@ function SearchCanvas(roomId, callback) {
 function MyRoomUpdated(roomId) {
     io.in(roomId).emit("RoomUpdated", { room: rooms[roomId].ToHash() });
 }
+// ターンが更新された
+function TurnUpdate(roomId) {
+    io.in(roomId).emit("TurnAdd", { room: rooms[roomId].ToHash() });
+}
 io.sockets.on("connection", function (socket) {
     console.log("Player connected.");
     //
@@ -86,8 +90,8 @@ io.sockets.on("connection", function (socket) {
                 isSuccess: true,
                 room: rooms[data.roomId].ToHash()
             });
-            UpdateRooms();
         }
+        UpdateRooms();
         MyRoomUpdated(data.roomId);
     });
     // パスワードの認証
@@ -108,10 +112,15 @@ io.sockets.on("connection", function (socket) {
     // 切断
     socket.on("disconnect", function () {
         // プレイヤーがいた部屋を特定して更新イベントを投げる
+        // そのプレイヤーの手番だった場合手番更新イベントも投げる
         var targetRoomId = null;
+        var turnUpdate = false;
         Object.keys(rooms).forEach(function (key) {
             if (rooms[key].hasPlayer(socket.id)) {
                 targetRoomId = key;
+                if (rooms[key].TurnPlayer.Id == socket.id) {
+                    turnUpdate = true;
+                }
             }
         });
         // 全ての部屋に対して、このプレイヤーをRemoveするよう試みる。
@@ -119,12 +128,20 @@ io.sockets.on("connection", function (socket) {
         console.log("Player disconnected.");
         if (targetRoomId != null && rooms[targetRoomId] != undefined) {
             MyRoomUpdated(targetRoomId);
+            if (turnUpdate) {
+                TurnUpdate(targetRoomId);
+            }
         }
         UpdateRooms();
     });
     // 線が描かれた
     socket.on("Draw", function (data) {
         socket.broadcast.to(data.roomId).emit("Drawed", data.data);
+    });
+    // お絵かき完了、手番進む
+    socket.on("DoneDrawing", function (data) {
+        rooms[data.roomId].addTurn();
+        TurnUpdate(data.roomId);
     });
     //// プレイヤーが接続
     //socket.on("Connected", name => {

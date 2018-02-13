@@ -96,6 +96,12 @@ var MyCanvas;
             img.src = image;
             img.onload = function () { return _this.ctx.drawImage(img, 0, 0); };
         };
+        /**
+         * キャンバスをクリアします。
+         */
+        Canvas.prototype.Clear = function () {
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        };
         Canvas.prototype.addEventListeners = function () {
             var _this = this;
             this.canvas.addEventListener("mousemove", function (e) { return _this.mouseMove(e); });

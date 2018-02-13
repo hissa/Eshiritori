@@ -102,7 +102,8 @@
         RoomsUpdated,
         Drawed,
         ReportCanvas,
-        RoomUpdated
+        RoomUpdated,
+        TurnAdd
     };
 
     export class Connection2 {
@@ -116,6 +117,10 @@
             this.playerName = value;
         }
 
+        get SocketId(): string {
+            return this.socket.id;
+        }
+
         constructor() {
             this.socket = io.connect("/");
         }
@@ -124,13 +129,17 @@
             this.socket.emit("NewRoom", { roomName: roomName, password: password}, retData => {
                 let roomId = retData.roomId;
                 this.socket.emit("EnterToRoom", { roomId: roomId, playerName: playerName, password: password }, retData2 => {
+                    this.PlayerName = playerName;
                     callback(retData2);
                 });
             });
         }
 
         public EnterToRoom(roomId: string, playerName: string, password = "", callback: (data) => void) {
-            this.socket.emit("EnterToRoom", { roomId: roomId, playerName: playerName, password: password }, data => callback(data));
+            this.socket.emit("EnterToRoom", { roomId: roomId, playerName: playerName, password: password }, data => {
+                this.PlayerName = playerName;
+                callback(data);
+            });
         }
 
         public GetRooms(callback: (data) => void){
@@ -149,6 +158,10 @@
                 data: data,
                 roomId: roomId
             });
+        }
+
+        public DoneDrawing(roomId: string) {
+            this.socket.emit("DoneDrawing", { roomId: roomId });
         }
 
         public AddEventListener(event: Connection2Event, func: (data, ack?) => void) {

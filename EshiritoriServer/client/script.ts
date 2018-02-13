@@ -68,10 +68,26 @@ connection.AddEventListener(Connections.Connection2Event.RoomUpdated, data => {
     console.log(myRoom);
     UpdateRoomStatus();
 });
+connection.AddEventListener(Connections.Connection2Event.TurnAdd, data => {
+    console.log(data.room);
+    myRoom = Components.Room.Parse(data.room);
+    UpdateRoomStatus();
+    this.canvas.Clear();
+});
 
 function UpdateRoomStatus() {
     playerList.CurrentPlayer = myRoom.CurrentPlayer;
     playerList.replacePlayers(myRoom.Members);
+    //infoBar.InformationType =
+    //    myRoom.CurrentPlayer.Id == connection.SocketId ?
+    //        Components.InformationType.YourTurn : Components.InformationType.None;
+    if (myRoom.CurrentPlayer.Id == connection.SocketId) {
+        infoBar.InformationType = Components.InformationType.YourTurn;
+        doneButton.Show();     
+    } else {
+        infoBar.InformationType = Components.InformationType.None;
+        doneButton.Hide();
+    }
 }
 //canvas.LineDrawedEvent = data => connection.draw(data);
 //connection.setEventListener(SocketEvent.LineDrawed, data => {
@@ -123,3 +139,14 @@ let penSizeSample = new Components.PenSizeSample(100, 100);
 penSizeSelector.Generate($("#cardpanelContentpalet"));
 penSizeSample.Generate($("#cardpanelContentpalet"));
 penSizeSelector.SelectedEvent = value => penSizeSample.PenSize = value;
+let doneButton = new Components.Button();
+doneButton.Style = Components.ButtonStyle.primary;
+doneButton.Size = Components.ButtonSize.Large;
+doneButton.Text = "完了";
+doneButton.Generate($("#yourTurn"), "done");
+doneButton.ClickedEvent = () => {
+    let res = confirm("完了しますか？");
+    if (res) {
+        connection.DoneDrawing(myRoom.Id);
+    }
+}

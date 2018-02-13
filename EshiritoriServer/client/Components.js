@@ -1007,6 +1007,12 @@ var Components;
             this.isGenerated = true;
             this.reload();
         };
+        Button.prototype.Show = function () {
+            this.object.show();
+        };
+        Button.prototype.Hide = function () {
+            this.object.hide();
+        };
         Button.prototype.reload = function () {
             if (!this.isGenerated)
                 return;

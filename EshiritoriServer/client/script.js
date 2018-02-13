@@ -19,6 +19,7 @@
 //    if (data.player.id == connection.Id) return;
 //    canvas.DrawByData(data.data);
 //});
+var _this = this;
 // クエリ文字列から変数を取得
 var queryStr = window.location.search;
 var values = [];
@@ -65,9 +66,26 @@ connection.AddEventListener(Connections.Connection2Event.RoomUpdated, function (
     console.log(myRoom);
     UpdateRoomStatus();
 });
+connection.AddEventListener(Connections.Connection2Event.TurnAdd, function (data) {
+    console.log(data.room);
+    myRoom = Components.Room.Parse(data.room);
+    UpdateRoomStatus();
+    _this.canvas.Clear();
+});
 function UpdateRoomStatus() {
     playerList.CurrentPlayer = myRoom.CurrentPlayer;
     playerList.replacePlayers(myRoom.Members);
+    //infoBar.InformationType =
+    //    myRoom.CurrentPlayer.Id == connection.SocketId ?
+    //        Components.InformationType.YourTurn : Components.InformationType.None;
+    if (myRoom.CurrentPlayer.Id == connection.SocketId) {
+        infoBar.InformationType = Components.InformationType.YourTurn;
+        doneButton.Show();
+    }
+    else {
+        infoBar.InformationType = Components.InformationType.None;
+        doneButton.Hide();
+    }
 }
 //canvas.LineDrawedEvent = data => connection.draw(data);
 //connection.setEventListener(SocketEvent.LineDrawed, data => {
@@ -118,4 +136,15 @@ var penSizeSample = new Components.PenSizeSample(100, 100);
 penSizeSelector.Generate($("#cardpanelContentpalet"));
 penSizeSample.Generate($("#cardpanelContentpalet"));
 penSizeSelector.SelectedEvent = function (value) { return penSizeSample.PenSize = value; };
+var doneButton = new Components.Button();
+doneButton.Style = Components.ButtonStyle.primary;
+doneButton.Size = Components.ButtonSize.Large;
+doneButton.Text = "完了";
+doneButton.Generate($("#yourTurn"), "done");
+doneButton.ClickedEvent = function () {
+    var res = confirm("完了しますか？");
+    if (res) {
+        connection.DoneDrawing(myRoom.Id);
+    }
+};
 //# sourceMappingURL=script.js.map

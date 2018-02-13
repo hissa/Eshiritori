@@ -66,7 +66,7 @@ var Room = (function () {
             return this.turn;
         },
         set: function (value) {
-            this.turn = value % this.members.length - 1;
+            this.turn = value % this.members.length;
         },
         enumerable: true,
         configurable: true
@@ -111,6 +111,9 @@ var Room = (function () {
         }
         if (this.Members.length <= 0) {
             this.beEmptyEvent(this);
+        }
+        if (this.members.length - 1 > this.Turn) {
+            this.Turn = 0;
         }
     };
     Room.prototype.ToHash = function () {

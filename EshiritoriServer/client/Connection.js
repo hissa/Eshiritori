@@ -102,6 +102,7 @@ var Connections;
         Connection2Event[Connection2Event["Drawed"] = 1] = "Drawed";
         Connection2Event[Connection2Event["ReportCanvas"] = 2] = "ReportCanvas";
         Connection2Event[Connection2Event["RoomUpdated"] = 3] = "RoomUpdated";
+        Connection2Event[Connection2Event["TurnAdd"] = 4] = "TurnAdd";
     })(Connections.Connection2Event || (Connections.Connection2Event = {}));
     var Connection2Event = Connections.Connection2Event;
     ;
@@ -121,19 +122,31 @@ var Connections;
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(Connection2.prototype, "SocketId", {
+            get: function () {
+                return this.socket.id;
+            },
+            enumerable: true,
+            configurable: true
+        });
         Connection2.prototype.EnterToNewRoom = function (roomName, playerName, password, callback) {
             var _this = this;
             if (password === void 0) { password = ""; }
             this.socket.emit("NewRoom", { roomName: roomName, password: password }, function (retData) {
                 var roomId = retData.roomId;
                 _this.socket.emit("EnterToRoom", { roomId: roomId, playerName: playerName, password: password }, function (retData2) {
+                    _this.PlayerName = playerName;
                     callback(retData2);
                 });
             });
         };
         Connection2.prototype.EnterToRoom = function (roomId, playerName, password, callback) {
+            var _this = this;
             if (password === void 0) { password = ""; }
-            this.socket.emit("EnterToRoom", { roomId: roomId, playerName: playerName, password: password }, function (data) { return callback(data); });
+            this.socket.emit("EnterToRoom", { roomId: roomId, playerName: playerName, password: password }, function (data) {
+                _this.PlayerName = playerName;
+                callback(data);
+            });
         };
         Connection2.prototype.GetRooms = function (callback) {
             this.socket.emit("GetRooms", {}, function (data) { return callback(data); });
@@ -149,6 +162,9 @@ var Connections;
                 data: data,
                 roomId: roomId
             });
+        };
+        Connection2.prototype.DoneDrawing = function (roomId) {
+            this.socket.emit("DoneDrawing", { roomId: roomId });
         };
         Connection2.prototype.AddEventListener = function (event, func) {
             this.socket.on(Connection2Event[event], func);
