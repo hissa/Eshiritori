@@ -118,19 +118,26 @@
         });
 
         this.canvas.LineDrawedEvent = data => this.connection.SubmitDrawing(data, this.myRoom.Id);
+
+        this.doneButton.ClickedEvent = () => {
+            if (confirm("完了しますか？")) {
+                this.connection.DoneDrawing(this.myRoom.Id);
+            }
+        }
     }
 
     private Update() {
         if (!this.doneLoad) return;
         this.playerList.CurrentPlayer = this.myRoom.CurrentPlayer;
         this.playerList.replacePlayers(this.myRoom.Members);
-        console.log(this.myRoom, this.player);
         if (this.myRoom.CurrentPlayer.Id == this.player.Id) {
             this.infoBar.InformationType = Components.InformationType.YourTurn;
             this.doneButton.Show();
+            this.canvas.CanDraw = true;
         } else {
             this.infoBar.InformationType = Components.InformationType.None;
             this.doneButton.Hide();
+            this.canvas.CanDraw = false;
         }
     }
 

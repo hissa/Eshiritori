@@ -115,20 +115,26 @@ var MainPage = (function () {
             _this.canvas.Clear();
         });
         this.canvas.LineDrawedEvent = function (data) { return _this.connection.SubmitDrawing(data, _this.myRoom.Id); };
+        this.doneButton.ClickedEvent = function () {
+            if (confirm("完了しますか？")) {
+                _this.connection.DoneDrawing(_this.myRoom.Id);
+            }
+        };
     };
     MainPage.prototype.Update = function () {
         if (!this.doneLoad)
             return;
         this.playerList.CurrentPlayer = this.myRoom.CurrentPlayer;
         this.playerList.replacePlayers(this.myRoom.Members);
-        console.log(this.myRoom, this.player);
         if (this.myRoom.CurrentPlayer.Id == this.player.Id) {
             this.infoBar.InformationType = Components.InformationType.YourTurn;
             this.doneButton.Show();
+            this.canvas.CanDraw = true;
         }
         else {
             this.infoBar.InformationType = Components.InformationType.None;
             this.doneButton.Hide();
+            this.canvas.CanDraw = false;
         }
     };
     MainPage.getQueryValues = function () {
