@@ -41,6 +41,7 @@ function SearchCanvas(roomId: string, callback: (data) => void) {
 
 // 部屋が更新された
 function MyRoomUpdated(roomId) {
+    if (rooms[roomId] == undefined) return;
     io.in(roomId).emit("RoomUpdated", { room: rooms[roomId].ToHash() });
 }
 
