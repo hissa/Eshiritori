@@ -66,6 +66,9 @@ var Room = (function () {
             return this.turn;
         },
         set: function (value) {
+            if (this.members.length == 0) {
+                this.turn = 0;
+            }
             this.turn = value % this.members.length;
         },
         enumerable: true,
@@ -117,6 +120,7 @@ var Room = (function () {
         }
     };
     Room.prototype.ToHash = function () {
+        this.Normalize();
         var membersHash = [];
         this.members.forEach(function (value) {
             membersHash.push(value.ToHash());
@@ -140,6 +144,12 @@ var Room = (function () {
             }
         });
         return ret;
+    };
+    Room.prototype.Normalize = function () {
+        if (this.turn == 0) {
+            return;
+        }
+        this.turn = this.turn % this.members.length;
     };
     return Room;
 }());

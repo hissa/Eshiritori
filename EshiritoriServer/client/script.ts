@@ -155,6 +155,7 @@
             });
         });
         this.connection.AddEventListener(Connections.Connection2Event.RoomUpdated, data => {
+            console.log(data);
             this.MyRoom = Components.Room.Parse(data.room);
         });
         this.connection.AddEventListener(Connections.Connection2Event.TurnAdd, data => {
@@ -234,7 +235,10 @@ class ExistingRoomPage extends MainPage {
         this.roomId = this.queryValues["roomId"];
         this.password = this.queryValues["password"];
         this.connection.EnterToRoom(this.roomId, this.player.Name, this.password, data => {
-            console.log(data);
+            if (!data.isSuccess) {
+                alert("入室に失敗しました。ルーム一覧に戻ります。");
+                MainPage.returnRoomList();
+            }
             this.MyRoom = Components.Room.Parse(data.room);
             this.defaultImage = data.canvasImage;
             this.defaultLogs = data.logs;

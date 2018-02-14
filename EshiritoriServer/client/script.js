@@ -150,6 +150,7 @@ var MainPage = (function () {
             });
         });
         this.connection.AddEventListener(Connections.Connection2Event.RoomUpdated, function (data) {
+            console.log(data);
             _this.MyRoom = Components.Room.Parse(data.room);
         });
         this.connection.AddEventListener(Connections.Connection2Event.TurnAdd, function (data) {
@@ -221,7 +222,10 @@ var ExistingRoomPage = (function (_super) {
         this.roomId = this.queryValues["roomId"];
         this.password = this.queryValues["password"];
         this.connection.EnterToRoom(this.roomId, this.player.Name, this.password, function (data) {
-            console.log(data);
+            if (!data.isSuccess) {
+                alert("入室に失敗しました。ルーム一覧に戻ります。");
+                MainPage.returnRoomList();
+            }
             _this.MyRoom = Components.Room.Parse(data.room);
             _this.defaultImage = data.canvasImage;
             _this.defaultLogs = data.logs;

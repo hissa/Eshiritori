@@ -41,6 +41,9 @@
         return this.turn;
     }
     set Turn(value: number) {
+        if (this.members.length == 0) {
+            this.turn = 0;
+        }
         this.turn = value % this.members.length;
     }
 
@@ -90,6 +93,7 @@
     }
 
     public ToHash() {
+        this.Normalize();
         let membersHash = [];
         this.members.forEach(value => {
             membersHash.push(value.ToHash());
@@ -115,6 +119,13 @@
             }
         });
         return ret;
+    }
+
+    public Normalize() {
+        if (this.turn == 0) {
+            return;
+        }
+        this.turn = this.turn % this.members.length;
     }
 }
 
