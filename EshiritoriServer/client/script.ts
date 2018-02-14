@@ -22,6 +22,7 @@
     protected colorPalette: JQuery = null;
     protected penSizeSelector: Components.PenSizeSelector = null;
     protected penSizeSample: Components.PenSizeSample = null;
+    protected returnRoomListButton: Components.Button = null;
     // イベント
     protected onload: () => void = () => { };
 
@@ -81,6 +82,7 @@
 
         this.playersPanel = new Components.CardPanel();
         this.playersPanel.HeaderText = "プレイヤー";
+        this.playersPanel.FooterText = " ";
         this.playersPanel.Generate($("#playerList"), "players");
 
         this.drawLogsPanel = new Components.CardPanel();
@@ -130,6 +132,15 @@
 
         this.penSizeSample = new Components.PenSizeSample(100, 100, 5);
         this.penSizeSample.Generate(this.toolboxPanel.BodyObject);
+
+        this.returnRoomListButton = new Components.Button();
+        this.returnRoomListButton.Style = Components.ButtonStyle.danger;
+        this.returnRoomListButton.Text = "退室";
+        this.returnRoomListButton.ClickedEvent = () => {
+            if (!confirm("退室しますか？")) return;
+            MainPage.returnRoomList();
+        };
+        this.returnRoomListButton.Generate(this.playersPanel.FooterObject, "return");
 
         this.doneLoad = true;
         this.Update();
@@ -204,6 +215,10 @@
 
     static removeQueryString() {
         history.pushState(null, null, "/index.html");
+    }
+
+    static returnRoomList() {
+        window.location.href = "/";
     }
 }
 

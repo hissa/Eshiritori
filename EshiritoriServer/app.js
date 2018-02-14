@@ -52,7 +52,6 @@ io.sockets.on("connection", function (socket) {
         var ret = [];
         Object.keys(rooms).forEach(function (key) { return ret.push(rooms[key].ToHash()); });
         ack(ret);
-        console.log(ret);
     });
     // 部屋の作成
     socket.on("NewRoom", function (data, ack) {
@@ -75,7 +74,6 @@ io.sockets.on("connection", function (socket) {
                 //rooms[data.roomId].AddPlayer(new Rooms.Player(socket.id, data.playerName));
                 socket.join(data.roomId);
                 rooms[data.roomId].AddPlayer(new Rooms.Player(socket.id, data.playerName));
-                console.log(canvasData.logs);
                 ack({
                     isSuccess: true,
                     room: rooms[data.roomId].ToHash(),
@@ -100,7 +98,6 @@ io.sockets.on("connection", function (socket) {
     // パスワードの認証
     socket.on("VerifyPassword", function (data, ack) {
         if (rooms[data.roomId] == undefined) {
-            console.log(data, rooms);
             if (!rooms[data.roomId].HasPassword) {
                 ack({ success: true });
                 return;
@@ -128,7 +125,6 @@ io.sockets.on("connection", function (socket) {
         });
         // 全ての部屋に対して、このプレイヤーをRemoveするよう試みる。
         Object.keys(rooms).forEach(function (key) { return rooms[key].RemovePlayer(socket.id); });
-        console.log("Player disconnected.");
         if (targetRoomId != null && rooms[targetRoomId] != undefined) {
             MyRoomUpdated(targetRoomId);
             if (turnUpdate) {
@@ -150,69 +146,5 @@ io.sockets.on("connection", function (socket) {
     socket.on("ChatEmit", function (data) {
         io.in(data.roomId).emit("ChatReceive", { playerName: data.playerName, message: data.message });
     });
-    //// プレイヤーが接続
-    //socket.on("Connected", name => {
-    //    users[socket.id] = name;
-    //    io.sockets.emit("PlayerConnected", {
-    //        player: {
-    //            name: name,
-    //            id: socket.id
-    //        }
-    //    });
-    //    console.log(`Connected: ${name}`);
-    //});
-    //// メッセージ投稿
-    //socket.on("Publish", data => {
-    //    io.sockets.emit("MessagePublished", {
-    //        value: data.value,
-    //        player: {
-    //            name: users[socket.id],
-    //            id: socket.id
-    //        }
-    //    });
-    //    console.log(`Published: [${users[socket.id]}]${data.value}`);
-    //});
-    //// プレイヤーが切断
-    //socket.on("disconnect", () => {
-    //    //if (users[socket.id]) {
-    //    //    let name = users[socket.id];
-    //    //    delete users[socket.id];
-    //    //    io.sockets.emit("PlayerDisconnected", {
-    //    //        player: {
-    //    //            name: name,
-    //    //            id: socket.id
-    //    //        }
-    //    //    });
-    //    //    console.log(`Disconnected: ${name}`);
-    //    //}
-    //    let room = io.sockets.manager.roomClients[socket.id];
-    //    socket.leave(room);
-    //    rooms[room].RemovePlayer(socket.id);
-    //});
-    //// 線の情報が到着
-    //socket.on("Drawing", data => {
-    //    io.sockets.emit("LineDrawed", {
-    //        player: {
-    //            name: users[socket.id],
-    //            id: socket.id
-    //        },
-    //        data
-    //    });
-    //});
-    //// 部屋の情報の問い合わせ
-    //socket.on("GetRooms", data => {
-    //    let ret = [];
-    //    rooms.forEach(value => ret.push(value.ToHash()));
-    //    io.to(socket.id).emit("GetRoomsResponse", ret);
-    //});
-    //// 部屋を作成
-    //socket.on("NewRoom", data => {
-    //    rooms[socket.id] = new Rooms.Room(socket.id, data.value.name);
-    //});
-    //// 部屋に接続
-    //socket.on("ConnectToRoom", data => {
-    //    rooms[data.id].AddPlayer(new Rooms.Player(data.value.player.id, data.value.player.name));
-    //    socket.join(rooms[data.id].RoomId);
-    //});
 });
 //# sourceMappingURL=app.js.map

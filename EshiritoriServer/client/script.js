@@ -29,6 +29,7 @@ var MainPage = (function () {
         this.colorPalette = null;
         this.penSizeSelector = null;
         this.penSizeSample = null;
+        this.returnRoomListButton = null;
         // イベント
         this.onload = function () { };
         this.queryValues = MainPage.getQueryValues();
@@ -87,6 +88,7 @@ var MainPage = (function () {
         this.chatPanel.Generate($("#chat"), "chat");
         this.playersPanel = new Components.CardPanel();
         this.playersPanel.HeaderText = "プレイヤー";
+        this.playersPanel.FooterText = " ";
         this.playersPanel.Generate($("#playerList"), "players");
         this.drawLogsPanel = new Components.CardPanel();
         this.drawLogsPanel.HeaderText = "ログ";
@@ -126,6 +128,15 @@ var MainPage = (function () {
         this.penSizeSelector.Generate(this.toolboxPanel.BodyObject);
         this.penSizeSample = new Components.PenSizeSample(100, 100, 5);
         this.penSizeSample.Generate(this.toolboxPanel.BodyObject);
+        this.returnRoomListButton = new Components.Button();
+        this.returnRoomListButton.Style = Components.ButtonStyle.danger;
+        this.returnRoomListButton.Text = "退室";
+        this.returnRoomListButton.ClickedEvent = function () {
+            if (!confirm("退室しますか？"))
+                return;
+            MainPage.returnRoomList();
+        };
+        this.returnRoomListButton.Generate(this.playersPanel.FooterObject, "return");
         this.doneLoad = true;
         this.Update();
     };
@@ -191,6 +202,9 @@ var MainPage = (function () {
     };
     MainPage.removeQueryString = function () {
         history.pushState(null, null, "/index.html");
+    };
+    MainPage.returnRoomList = function () {
+        window.location.href = "/";
     };
     return MainPage;
 }());
