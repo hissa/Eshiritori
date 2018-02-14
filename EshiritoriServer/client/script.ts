@@ -6,8 +6,9 @@
     protected myRoom: Components.Room = null;
     protected doneLoad = false;
     protected defaultImage: string = null;
+    protected defaultLogs: string[] = [];
     // コンポーネント
-    protected toolboxPanel: Components.CardPanel = null; // 未実装
+    protected toolboxPanel: Components.CardPanel = null;
     protected chatPanel: Components.CardPanel = null;
     protected playersPanel: Components.CardPanel = null;
     protected drawLogsPanel: Components.CardPanel = null;
@@ -16,7 +17,11 @@
     protected infoBar: Components.InfomationBar = null;
     protected playerList: Components.PlayerList = null;
     protected doneButton: Components.Button = null;
+    protected imageLogs: Components.ImageLog = null;
     protected canvas: MyCanvas.Canvas = null;
+    protected colorPalette: JQuery = null;
+    protected penSizeSelector: Components.PenSizeSelector = null;
+    protected penSizeSample: Components.PenSizeSample = null;
     // イベント
     protected onload: () => void = () => { };
 
@@ -53,7 +58,9 @@
                 if (this.defaultImage != null) {
                     this.canvas.ShowImage(this.defaultImage);
                 }
+                this.imageLogs.LoadDataUrlArray(this.defaultLogs);
                 this.addEventListeners();
+                this.onload();
             });
         });
     }
@@ -62,6 +69,7 @@
 
     protected MakeComponents() {
         this.canvas = new MyCanvas.Canvas(<HTMLCanvasElement>document.getElementById("canvas"));
+        this.canvas.LineWidth = 5;
 
         this.toolboxPanel = new Components.CardPanel();
         this.toolboxPanel.HeaderText = "パレット";
@@ -77,7 +85,6 @@
 
         this.drawLogsPanel = new Components.CardPanel();
         this.drawLogsPanel.HeaderText = "ログ";
-        this.drawLogsPanel.ContentText = "ここに過去の絵を表示";
         this.drawLogsPanel.Generate($("#drawlog"), "drawlog");
 
         this.infoBar = new Components.InfomationBar();
@@ -98,6 +105,32 @@
         this.doneButton.Text = "完了";
         this.doneButton.Generate($("#yourTurn"), "done");
 
+        this.imageLogs = new Components.ImageLog(5);
+        this.imageLogs.Generate(this.drawLogsPanel.BodyObject, "log");
+
+        this.toolboxPanel.BodyObject.append("<input type=\"text\" id=\"colorPicker\">");
+        this.colorPalette = $("#colorPicker");
+        this.colorPalette.spectrum({
+            color: "#000000",
+            togglePaletteOnly: true,
+            showPalette:true,
+            palette: [
+                ["#000000", "#ffffff"],
+                ["#7d00ff", "#ff0000"],
+                ["#0000ff", "#ff8500"],
+                ["#33ff00", "#f2ff00"]
+            ],
+            change: (color) => this.canvas.LineColor = color.toRgbString()
+        });
+
+        this.penSizeSelector = new Components.PenSizeSelector([
+            5, 10, 20, 30, 50, 80, 100
+        ]);
+        this.penSizeSelector.Generate(this.toolboxPanel.BodyObject);
+
+        this.penSizeSample = new Components.PenSizeSample(100, 100, 5);
+        this.penSizeSample.Generate(this.toolboxPanel.BodyObject);
+
         this.doneLoad = true;
         this.Update();
     }
@@ -106,7 +139,8 @@
         this.connection.AddEventListener(Connections.Connection2Event.Drawed, data => this.canvas.DrawByData(data));
         this.connection.AddEventListener(Connections.Connection2Event.ReportCanvas, (data, ack) => {
             ack({
-                image: this.canvas.CanvasElement.toDataURL()
+                image: this.canvas.CanvasElement.toDataURL(),
+                logs: this.imageLogs.toDataUrlArray()
             });
         });
         this.connection.AddEventListener(Connections.Connection2Event.RoomUpdated, data => {
@@ -114,15 +148,31 @@
         });
         this.connection.AddEventListener(Connections.Connection2Event.TurnAdd, data => {
             this.MyRoom = Components.Room.Parse(data.room);
+            this.imageLogs.AddImage(this.canvas.CanvasElement.toDataURL());
             this.canvas.Clear();
+        });
+        this.connection.AddEventListener(Connections.Connection2Event.ChatReceive, data => {
+            this.chatLog.addMessage(new Components.ChatMessage(data.playerName, data.message));
         });
 
         this.canvas.LineDrawedEvent = data => this.connection.SubmitDrawing(data, this.myRoom.Id);
 
         this.doneButton.ClickedEvent = () => {
-            if (confirm("完了しますか？")) {
-                this.connection.DoneDrawing(this.myRoom.Id);
-            }
+            if (!confirm("完了しますか？")) return;
+            this.connection.DoneDrawing(this.myRoom.Id);
+        }
+
+        this.penSizeSelector.SelectedEvent = size => {
+            this.penSizeSample.PenSize = size;
+            this.canvas.LineWidth = size;
+        };
+
+        this.chatInput.SendMessageEvent = msg => {
+            this.connection.ChatEmit(
+                this.myRoom.Id,
+                this.player.Name,
+                msg
+            );
         }
     }
 
@@ -169,7 +219,10 @@ class ExistingRoomPage extends MainPage {
         this.roomId = this.queryValues["roomId"];
         this.password = this.queryValues["password"];
         this.connection.EnterToRoom(this.roomId, this.player.Name, this.password, data => {
+            console.log(data);
             this.MyRoom = Components.Room.Parse(data.room);
+            this.defaultImage = data.canvasImage;
+            this.defaultLogs = data.logs;
             callback();
         });
     }

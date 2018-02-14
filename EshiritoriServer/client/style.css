@@ -35,7 +35,7 @@ div {
 
 #drawlog{
     width: 1390px;
-    height: 200px;
+    height: 300px;
     clear: both;
 }
 
@@ -82,4 +82,24 @@ div {
 
 #buttondone{
     margin-right: 0;
+}
+
+.imageLog{
+    width:210px;
+    height:150px;
+    margin-right:10px;
+    border: solid 2px;
+}
+
+#imgloglog-0{
+    width:280px;
+    height:200px;
+}
+
+#chatinputchatinput{
+    bottom:5px;
+}
+
+#chatlogchatlog{
+    height: 470px;
 }

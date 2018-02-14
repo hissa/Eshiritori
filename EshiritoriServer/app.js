@@ -75,10 +75,12 @@ io.sockets.on("connection", function (socket) {
                 //rooms[data.roomId].AddPlayer(new Rooms.Player(socket.id, data.playerName));
                 socket.join(data.roomId);
                 rooms[data.roomId].AddPlayer(new Rooms.Player(socket.id, data.playerName));
+                console.log(canvasData.logs);
                 ack({
                     isSuccess: true,
                     room: rooms[data.roomId].ToHash(),
-                    canvasImage: canvasData.image
+                    canvasImage: canvasData.image,
+                    logs: canvasData.logs
                 });
             });
         }
@@ -143,6 +145,10 @@ io.sockets.on("connection", function (socket) {
     socket.on("DoneDrawing", function (data) {
         rooms[data.roomId].addTurn();
         TurnUpdate(data.roomId);
+    });
+    // チャットを受信
+    socket.on("ChatEmit", function (data) {
+        io.in(data.roomId).emit("ChatReceive", { playerName: data.playerName, message: data.message });
     });
     //// プレイヤーが接続
     //socket.on("Connected", name => {

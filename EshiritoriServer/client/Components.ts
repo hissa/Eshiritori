@@ -1367,4 +1367,91 @@ namespace Components {
             });
         }
     }
+
+    export class ImageBox extends Component {
+        private src = "";
+        private unique = "";
+        private object: JQuery = null;
+        private isGenerated = false;
+
+        get IsGenerated(): boolean {
+            return this.isGenerated;
+        }
+
+        get Src(): string {
+            return this.src;
+        }
+        set Src(value: string) {
+            this.src = value;
+            if (this.IsGenerated) {
+                this.object.attr({ "src": this.src });
+            }
+        }
+
+        get Object(): JQuery {
+            return this.object;
+        }
+
+        public Generate(parent: JQuery, idName?: string) {
+            this.unique = idName != undefined ? idName : UniqueIdGenerater.Get().toString();
+            parent.append(`<img id="img${this.unique}" />`);
+            this.object = $(`#img${this.unique}`);
+            this.object.attr({ "src": this.src });
+            this.isGenerated = true;
+        }
+    }
+
+    export class ImageLog extends Component {
+        private isGenerate = false;
+        private unique = "";
+        private images: ImageBox[] = [];
+        private logNumber = 0;
+
+        get IsGenerated(): boolean {
+            return this.isGenerate;
+        }
+
+        constructor(logNumber: number) {
+            super();
+            this.logNumber = logNumber;
+            for (let i = 0; i < logNumber; i++) {
+                this.images.push(new ImageBox());
+            }
+        }
+
+        public Generate(parent: JQuery, idName?: string) {
+            this.unique = idName != undefined ? idName : UniqueIdGenerater.Get().toString();
+            this.images.forEach((value, index) => {
+                value.Generate(parent, `log${this.unique}-${index}`);
+                value.Object.addClass("imageLog");
+            });
+            this.isGenerate = true;
+        }
+
+        public AddImage(src: string) {
+            for (let i = this.images.length - 1; i >= 0; i--) {
+                if (i == 0) {
+                    this.images[i].Src = src;
+                } else {
+                    this.images[i].Src = this.images[i - 1].Src;
+                }
+            }
+        }
+
+        public toDataUrlArray() {
+            let ret: string[] = [];
+            this.images.forEach(value => {
+                ret.push(value.Src);
+            });
+            return ret;
+        }
+
+        public LoadDataUrlArray(array: string[]) {
+            array.forEach((value, index) => {
+                if (this.images[index] != undefined) {
+                    this.images[index].Src = value;
+                }
+            });
+        }
+    }
 }

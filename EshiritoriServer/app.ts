@@ -85,10 +85,12 @@ io.sockets.on("connection", socket => {
                 //rooms[data.roomId].AddPlayer(new Rooms.Player(socket.id, data.playerName));
                 socket.join(data.roomId);
                 rooms[data.roomId].AddPlayer(new Rooms.Player(socket.id, data.playerName));
+                console.log(canvasData.logs);
                 ack({
                     isSuccess: true,
                     room: rooms[data.roomId].ToHash(),
-                    canvasImage: canvasData.image
+                    canvasImage: canvasData.image,
+                    logs: canvasData.logs
                 });
             });
         } else {
@@ -157,6 +159,11 @@ io.sockets.on("connection", socket => {
     socket.on("DoneDrawing", data => {
         rooms[data.roomId].addTurn();
         TurnUpdate(data.roomId);
+    });
+
+    // チャットを受信
+    socket.on("ChatEmit", data => {
+        io.in(data.roomId).emit("ChatReceive", { playerName:data.playerName, message: data.message });
     });
 
 

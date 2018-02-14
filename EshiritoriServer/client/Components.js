@@ -1612,5 +1612,108 @@ var Components;
         return NewRoomModal;
     }(Component));
     Components.NewRoomModal = NewRoomModal;
+    var ImageBox = (function (_super) {
+        __extends(ImageBox, _super);
+        function ImageBox() {
+            _super.apply(this, arguments);
+            this.src = "";
+            this.unique = "";
+            this.object = null;
+            this.isGenerated = false;
+        }
+        Object.defineProperty(ImageBox.prototype, "IsGenerated", {
+            get: function () {
+                return this.isGenerated;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(ImageBox.prototype, "Src", {
+            get: function () {
+                return this.src;
+            },
+            set: function (value) {
+                this.src = value;
+                if (this.IsGenerated) {
+                    this.object.attr({ "src": this.src });
+                }
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Object.defineProperty(ImageBox.prototype, "Object", {
+            get: function () {
+                return this.object;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        ImageBox.prototype.Generate = function (parent, idName) {
+            this.unique = idName != undefined ? idName : UniqueIdGenerater.Get().toString();
+            parent.append("<img id=\"img" + this.unique + "\" />");
+            this.object = $("#img" + this.unique);
+            this.object.attr({ "src": this.src });
+            this.isGenerated = true;
+        };
+        return ImageBox;
+    }(Component));
+    Components.ImageBox = ImageBox;
+    var ImageLog = (function (_super) {
+        __extends(ImageLog, _super);
+        function ImageLog(logNumber) {
+            _super.call(this);
+            this.isGenerate = false;
+            this.unique = "";
+            this.images = [];
+            this.logNumber = 0;
+            this.logNumber = logNumber;
+            for (var i = 0; i < logNumber; i++) {
+                this.images.push(new ImageBox());
+            }
+        }
+        Object.defineProperty(ImageLog.prototype, "IsGenerated", {
+            get: function () {
+                return this.isGenerate;
+            },
+            enumerable: true,
+            configurable: true
+        });
+        ImageLog.prototype.Generate = function (parent, idName) {
+            var _this = this;
+            this.unique = idName != undefined ? idName : UniqueIdGenerater.Get().toString();
+            this.images.forEach(function (value, index) {
+                value.Generate(parent, "log" + _this.unique + "-" + index);
+                value.Object.addClass("imageLog");
+            });
+            this.isGenerate = true;
+        };
+        ImageLog.prototype.AddImage = function (src) {
+            for (var i = this.images.length - 1; i >= 0; i--) {
+                if (i == 0) {
+                    this.images[i].Src = src;
+                }
+                else {
+                    this.images[i].Src = this.images[i - 1].Src;
+                }
+            }
+        };
+        ImageLog.prototype.toDataUrlArray = function () {
+            var ret = [];
+            this.images.forEach(function (value) {
+                ret.push(value.Src);
+            });
+            return ret;
+        };
+        ImageLog.prototype.LoadDataUrlArray = function (array) {
+            var _this = this;
+            array.forEach(function (value, index) {
+                if (_this.images[index] != undefined) {
+                    _this.images[index].Src = value;
+                }
+            });
+        };
+        return ImageLog;
+    }(Component));
+    Components.ImageLog = ImageLog;
 })(Components || (Components = {}));
 //# sourceMappingURL=Components.js.map

@@ -104,7 +104,8 @@
         ReportCanvas,
         RoomUpdated,
         TurnAdd,
-        connect
+        connect,
+        ChatReceive
     };
 
     export class Connection2 {
@@ -163,6 +164,14 @@
 
         public DoneDrawing(roomId: string) {
             this.socket.emit("DoneDrawing", { roomId: roomId });
+        }
+
+        public ChatEmit(roomId: string, playerName: string, message: string) {
+            this.socket.emit("ChatEmit", {
+                roomId: roomId,
+                playerName: playerName,
+                message: message
+            });
         }
 
         public AddEventListener(event: Connection2Event, func: (data, ack?) => void) {
