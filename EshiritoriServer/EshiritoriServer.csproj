@@ -37,6 +37,8 @@
     <TypeScriptCompile Include="Scripts\typings\node\node.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\socket.io-client\socket.io-client.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\socket.io\socket.io.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\spectrum\spectrum.d.ts" />
+    <TypeScriptCompile Include="Scripts\typings\tinycolor\tinycolor.d.ts" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="client\index.html" />

@@ -114,6 +114,7 @@ var MainPage = (function () {
             color: "#000000",
             togglePaletteOnly: true,
             showPalette: true,
+            hideAfterPaletteSelect: true,
             palette: [
                 ["#000000", "#ffffff"],
                 ["#7d00ff", "#ff0000"],
