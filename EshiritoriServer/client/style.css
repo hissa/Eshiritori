@@ -102,7 +102,7 @@ div {
 
 #chatlogchatlog{
     height: 470px;
-    /*overflow:auto;*/
+    overflow:auto;
     /*TODO: 受信時にスクロールを一番下にする*/
 }
 

@@ -97,7 +97,7 @@ var MainPage = (function () {
         this.infoBar.Generate($("#yourTurn"), "yourturn");
         this.playerList = new Components.PlayerList();
         this.playerList.Generate(this.playersPanel.BodyObject, "playerlist");
-        this.chatLog = new Components.ChatLog(10);
+        this.chatLog = new Components.ChatLog(30);
         this.chatLog.Generate(this.chatPanel.BodyObject, "chatlog");
         this.chatInput = new Components.ChatInput();
         this.chatInput.Generate(this.chatPanel.BodyObject, "chatinput");
