@@ -1,0 +1,111 @@
+﻿body {
+}
+
+.mainCanvas {
+    border: solid;
+}
+
+div {
+    /*border: solid;*/
+}
+
+#mainArea{
+    width: 740px;
+    height: 600px;
+    float: left;
+}
+
+#column2{
+    width: 150px;
+    height: 600px;
+    float: left;
+}
+
+#column3{
+    width: 200px;
+    height:600px;
+    float: left;
+}
+
+#playerList{
+    width: 300px;
+    height: 600px;
+    float: left;
+}
+
+#drawlog{
+    width: 1390px;
+    height: 300px;
+    clear: both;
+}
+
+.mainCanvas{
+    margin-left: 20px;
+    margin-top: 30px;
+}
+
+#yourTurn{
+    height: 50px;
+    width: 100%;
+}
+
+#chat{
+    height:600px;
+}
+
+#toolBox{
+    height: 100%;
+}
+
+#cardpanelpalet{
+    height: 100%;
+}
+
+#cardpanelchat{
+    height: 100%;
+}
+
+#cardpanelplayers{
+    height: 100%;
+}
+
+#cardpaneldrawlog{
+    height: 100%;
+}
+
+#informationbaryourturn{
+    text-align: center;
+    padding-right: 0;
+    width: 88%;
+    float: left;
+}
+
+#buttondone{
+    margin-right: 0;
+}
+
+.imageLog{
+    width:210px;
+    height:150px;
+    margin-right:10px;
+    border: solid 2px;
+}
+
+#imgloglog-0{
+    width:280px;
+    height:200px;
+}
+
+#chatinputchatinput{
+    bottom:5px;
+}
+
+#chatlogchatlog{
+    height: 470px;
+    /*overflow:auto;*/
+    /*TODO: 受信時にスクロールを一番下にする*/
+}
+
+#buttonreturn{
+    margin-left: 80%;
+}
