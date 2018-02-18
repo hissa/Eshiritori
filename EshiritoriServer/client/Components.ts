@@ -375,6 +375,7 @@ namespace Components {
             for (let i = start; i <= end; i++) {
                 this.object.append(`<p>${this.messages[i].Sender}: ${this.messages[i].Message}</p>`);
             }
+            this.object.animate({ scrollTop: this.object[0].scrollHeight }, "fast");
         }
     }
 

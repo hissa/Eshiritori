@@ -15,6 +15,7 @@
         private isDrawing: boolean;
         private pen: Pen;
         private canDraw: boolean;
+        private outArea: boolean;
         // イベント
         private lineDrawedEvent: (data: any) => void = () => { };
 
@@ -67,6 +68,7 @@
             this.isDrawing = false;
             this.pen = new Pen();
             this.addEventListeners();
+            this.outArea = false;
         }
 
         /**
@@ -105,25 +107,54 @@
             this.canvas.addEventListener("mousemove", e => this.mouseMove(e));
             this.canvas.addEventListener("mousedown", e => this.mouseDown(e));
             this.canvas.addEventListener("mouseup", e => this.mouseUp(e));
+            // 枠外でイベントが発生した場合の対応
+            document.addEventListener("mouseup", e => this.mouseUp(e));
+            $("body").attr({ "onselectstart": "return false" });
+            document.addEventListener("mousemove", e => this.mouseMove(e));
+        }
+
+        private isContainPoint(point: Point): boolean {
+            let rect = this.CanvasElement.getBoundingClientRect();
+            if (rect.top > point.Y) {
+                return false;
+            }
+            if (rect.bottom < point.Y) {
+                return false;
+            }
+            if (rect.left > point.X) {
+                return false;
+            }
+            if (rect.right < point.X) {
+                return false;
+            }
+            return true;
         }
 
         private mouseMove(e: MouseEvent) {
             if (!this.isDrawing) return;
             if (!this.canDraw) return;
-            let target = <HTMLElement>e.target;
+            if (this.outArea) return;
+            let target = this.CanvasElement;
             let rect = target.getBoundingClientRect();
             this.point = new Point(e.clientX - rect.left, e.clientY - rect.top);
+            if (!this.isContainPoint(new Point(e.clientX, e.clientY))) {
+                this.outArea = true;
+            }
             this.draw();
         }
 
         private mouseDown(e: MouseEvent) {
+            if (!this.isContainPoint(new Point(e.clientX, e.clientY))) {
+                return;
+            }
+            this.outArea = false;
             this.isDrawing = true;
             let target = <HTMLElement>e.target;
             let rect = target.getBoundingClientRect();
             this.beforPoint = new Point(e.clientX - rect.left, e.clientY - rect.top);
         }
 
-        private mouseUp(e: MouseEvent) {
+        private mouseUp(e?: MouseEvent) {
             this.isDrawing = false;
         }
 
