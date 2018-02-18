@@ -26,6 +26,7 @@ var MyCanvas;
             this.isDrawing = false;
             this.pen = new Pen();
             this.addEventListeners();
+            this.outArea = false;
         }
         Object.defineProperty(Canvas.prototype, "LineWidth", {
             // アクセサ
@@ -117,18 +118,47 @@ var MyCanvas;
             this.canvas.addEventListener("mousemove", function (e) { return _this.mouseMove(e); });
             this.canvas.addEventListener("mousedown", function (e) { return _this.mouseDown(e); });
             this.canvas.addEventListener("mouseup", function (e) { return _this.mouseUp(e); });
+            // 枠外でイベントが発生した場合の対応
+            document.addEventListener("mouseup", function (e) { return _this.mouseUp(e); });
+            $("body").attr({ "onselectstart": "return false" });
+            document.addEventListener("mousemove", function (e) { return _this.mouseMove(e); });
+        };
+        Canvas.prototype.isContainPoint = function (point) {
+            var rect = this.CanvasElement.getBoundingClientRect();
+            if (rect.top > point.Y) {
+                return false;
+            }
+            if (rect.bottom < point.Y) {
+                return false;
+            }
+            if (rect.left > point.X) {
+                return false;
+            }
+            if (rect.right < point.X) {
+                return false;
+            }
+            return true;
         };
         Canvas.prototype.mouseMove = function (e) {
             if (!this.isDrawing)
                 return;
             if (!this.canDraw)
                 return;
-            var target = e.target;
+            if (this.outArea)
+                return;
+            var target = this.CanvasElement;
             var rect = target.getBoundingClientRect();
             this.point = new Point(e.clientX - rect.left, e.clientY - rect.top);
+            if (!this.isContainPoint(new Point(e.clientX, e.clientY))) {
+                this.outArea = true;
+            }
             this.draw();
         };
         Canvas.prototype.mouseDown = function (e) {
+            if (!this.isContainPoint(new Point(e.clientX, e.clientY))) {
+                return;
+            }
+            this.outArea = false;
             this.isDrawing = true;
             var target = e.target;
             var rect = target.getBoundingClientRect();
