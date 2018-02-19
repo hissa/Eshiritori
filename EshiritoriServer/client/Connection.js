@@ -105,6 +105,7 @@ var Connections;
         Connection2Event[Connection2Event["TurnAdd"] = 4] = "TurnAdd";
         Connection2Event[Connection2Event["connect"] = 5] = "connect";
         Connection2Event[Connection2Event["ChatReceive"] = 6] = "ChatReceive";
+        Connection2Event[Connection2Event["CanvasUpdated"] = 7] = "CanvasUpdated";
     })(Connections.Connection2Event || (Connections.Connection2Event = {}));
     var Connection2Event = Connections.Connection2Event;
     ;
@@ -173,6 +174,12 @@ var Connections;
                 roomId: roomId,
                 playerName: playerName,
                 message: message
+            });
+        };
+        Connection2.prototype.CanvasUpdate = function (roomId, dataUrl) {
+            this.socket.emit("CanvasUpdate", {
+                roomId: roomId,
+                image: dataUrl
             });
         };
         Connection2.prototype.AddEventListener = function (event, func) {
