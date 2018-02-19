@@ -174,7 +174,7 @@ try {
         });
         // キャンバスの状態が更新
         socket.on("CanvasUpdate", function (data) {
-            io.in(data.roomId).emit("CanvasUpdated", { image: data.image });
+            socket.broadcast.to(data.roomId).emit("CanvasUpdated", { image: data.image });
         });
     });
 }

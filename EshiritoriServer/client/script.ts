@@ -24,6 +24,7 @@
     protected penSizeSample: Components.PenSizeSample = null;
     protected returnRoomListButton: Components.Button = null;
     protected clearCanvasButton: Components.Button = null;
+    protected backCanvasButton: Components.Button = null;
     // イベント
     protected onload: () => void = () => { };
 
@@ -72,6 +73,7 @@
     protected MakeComponents() {
         this.canvas = new MyCanvas.Canvas(<HTMLCanvasElement>document.getElementById("canvas"));
         this.canvas.LineWidth = 5;
+        this.canvas.addHistory();
 
         this.toolboxPanel = new Components.CardPanel();
         this.toolboxPanel.HeaderText = "パレット";
@@ -135,6 +137,10 @@
         this.penSizeSample = new Components.PenSizeSample(100, 100, 5);
         this.penSizeSample.Generate(this.toolboxPanel.BodyObject);
 
+        this.backCanvasButton = new Components.Button();
+        this.backCanvasButton.Text = "戻る";
+        this.backCanvasButton.Generate(this.toolboxPanel.BodyObject);
+
         this.clearCanvasButton = new Components.Button();
         this.clearCanvasButton.IsOutline = true;
         this.clearCanvasButton.Style = Components.ButtonStyle.danger;
@@ -170,6 +176,8 @@
             this.MyRoom = Components.Room.Parse(data.room);
             this.imageLogs.AddImage(this.canvas.CanvasElement.toDataURL());
             this.canvas.Clear();
+            this.canvas.clearHistories();
+            this.canvas.addHistory();
         });
         this.connection.AddEventListener(Connections.Connection2Event.ChatReceive, data => {
             this.chatLog.addMessage(new Components.ChatMessage(data.playerName, data.message));
@@ -205,7 +213,16 @@
             this.canvas.Clear();
             let img = this.canvas.CanvasElement.toDataURL();
             this.connection.CanvasUpdate(this.myRoom.Id, img);
-        }
+            this.canvas.addHistory();
+        };
+
+        this.backCanvasButton.ClickedEvent = () => {
+            if (this.myRoom.CurrentPlayer.Id != this.player.Id) return;
+            this.canvas.back(() => {
+                let img = this.canvas.CanvasElement.toDataURL();
+                this.connection.CanvasUpdate(this.myRoom.Id, img);
+            });
+        };
     }
 
     private Update() {

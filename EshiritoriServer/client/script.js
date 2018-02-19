@@ -31,6 +31,7 @@ var MainPage = (function () {
         this.penSizeSample = null;
         this.returnRoomListButton = null;
         this.clearCanvasButton = null;
+        this.backCanvasButton = null;
         // イベント
         this.onload = function () { };
         this.queryValues = MainPage.getQueryValues();
@@ -81,6 +82,7 @@ var MainPage = (function () {
         var _this = this;
         this.canvas = new MyCanvas.Canvas(document.getElementById("canvas"));
         this.canvas.LineWidth = 5;
+        this.canvas.addHistory();
         this.toolboxPanel = new Components.CardPanel();
         this.toolboxPanel.HeaderText = "パレット";
         this.toolboxPanel.Generate($("#toolBox"), "palet");
@@ -130,6 +132,9 @@ var MainPage = (function () {
         this.penSizeSelector.Generate(this.toolboxPanel.BodyObject);
         this.penSizeSample = new Components.PenSizeSample(100, 100, 5);
         this.penSizeSample.Generate(this.toolboxPanel.BodyObject);
+        this.backCanvasButton = new Components.Button();
+        this.backCanvasButton.Text = "戻る";
+        this.backCanvasButton.Generate(this.toolboxPanel.BodyObject);
         this.clearCanvasButton = new Components.Button();
         this.clearCanvasButton.IsOutline = true;
         this.clearCanvasButton.Style = Components.ButtonStyle.danger;
@@ -164,6 +169,8 @@ var MainPage = (function () {
             _this.MyRoom = Components.Room.Parse(data.room);
             _this.imageLogs.AddImage(_this.canvas.CanvasElement.toDataURL());
             _this.canvas.Clear();
+            _this.canvas.clearHistories();
+            _this.canvas.addHistory();
         });
         this.connection.AddEventListener(Connections.Connection2Event.ChatReceive, function (data) {
             _this.chatLog.addMessage(new Components.ChatMessage(data.playerName, data.message));
@@ -193,6 +200,15 @@ var MainPage = (function () {
             _this.canvas.Clear();
             var img = _this.canvas.CanvasElement.toDataURL();
             _this.connection.CanvasUpdate(_this.myRoom.Id, img);
+            _this.canvas.addHistory();
+        };
+        this.backCanvasButton.ClickedEvent = function () {
+            if (_this.myRoom.CurrentPlayer.Id != _this.player.Id)
+                return;
+            _this.canvas.back(function () {
+                var img = _this.canvas.CanvasElement.toDataURL();
+                _this.connection.CanvasUpdate(_this.myRoom.Id, img);
+            });
         };
     };
     MainPage.prototype.Update = function () {
