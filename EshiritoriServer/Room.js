@@ -109,6 +109,9 @@ var Room = (function () {
                 remIndex = index;
             }
         });
+        if (remIndex == null) {
+            return;
+        }
         if (remIndex != null) {
             this.members.splice(remIndex, 1);
         }
@@ -117,6 +120,9 @@ var Room = (function () {
         }
         if (this.members.length - 1 > this.Turn) {
             this.Turn = 0;
+        }
+        if (this.turn > remIndex) {
+            this.Turn--;
         }
     };
     Room.prototype.ToHash = function () {

@@ -81,6 +81,9 @@
                 remIndex = index;
             }
         });
+        if (remIndex == null) {
+            return;
+        }
         if (remIndex != null) {
             this.members.splice(remIndex, 1);
         }
@@ -89,6 +92,9 @@
         }
         if (this.members.length - 1 > this.Turn) {
             this.Turn = 0;
+        }
+        if (this.turn > remIndex) {
+            this.Turn--;
         }
     }
 
