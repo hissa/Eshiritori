@@ -16,6 +16,8 @@
         private pen: Pen;
         private canDraw: boolean;
         private outArea: boolean;
+        private Histories: string[];
+        private BackCursor: number;
         // イベント
         private lineDrawedEvent: (data: any) => void = () => { };
 
@@ -69,6 +71,8 @@
             this.pen = new Pen();
             this.addEventListeners();
             this.outArea = false;
+            this.Histories = [];
+            this.BackCursor = 0;
         }
 
         /**
@@ -90,10 +94,14 @@
          * DataUrlから描画します。
          * @param image DataURL
          */
-        public ShowImage(image: string) {
+        public ShowImage(image: string, callback = () => { }) {
             let img = new Image();
             img.src = image;
-            img.onload = () => this.ctx.drawImage(img, 0, 0);
+            //img.onload = () => this.ctx.drawImage(img, 0, 0);
+            img.onload = () => {
+                this.ctx.drawImage(img, 0, 0);
+                callback();
+            }
         }
 
         /**
@@ -155,6 +163,10 @@
         }
 
         private mouseUp(e?: MouseEvent) {
+            if (this.isDrawing) {
+                let img = this.CanvasElement.toDataURL();
+                this.addHistory(img);
+            }
             this.isDrawing = false;
         }
 
@@ -174,6 +186,31 @@
                 point: this.point.ToHash()
             });
             this.beforPoint = this.point;
+        }
+
+        public back(callback = () => { }) {
+            this.BackCursor++;
+            if (this.Histories[this.BackCursor] == undefined) return;
+            let url = this.Histories[this.BackCursor];
+            this.Clear();
+            this.ShowImage(url, callback);
+        }
+
+        public addHistory(dataUrl?: string) {
+            if (this.BackCursor > 0) {
+                this.Histories.splice(0, this.BackCursor);
+            }
+            dataUrl = dataUrl == undefined ? this.CanvasElement.toDataURL() : dataUrl;
+            this.Histories.unshift(dataUrl);
+            this.BackCursor = 0;
+        }
+
+        /**
+         * 戻る機能の為の履歴をクリアします。
+         */
+        public clearHistories() {
+            this.Histories = [];
+            this.BackCursor = 0;
         }
     }
 

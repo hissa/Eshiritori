@@ -30,6 +30,8 @@ var MainPage = (function () {
         this.penSizeSelector = null;
         this.penSizeSample = null;
         this.returnRoomListButton = null;
+        this.clearCanvasButton = null;
+        this.backCanvasButton = null;
         // イベント
         this.onload = function () { };
         this.queryValues = MainPage.getQueryValues();
@@ -80,6 +82,7 @@ var MainPage = (function () {
         var _this = this;
         this.canvas = new MyCanvas.Canvas(document.getElementById("canvas"));
         this.canvas.LineWidth = 5;
+        this.canvas.addHistory();
         this.toolboxPanel = new Components.CardPanel();
         this.toolboxPanel.HeaderText = "パレット";
         this.toolboxPanel.Generate($("#toolBox"), "palet");
@@ -129,6 +132,14 @@ var MainPage = (function () {
         this.penSizeSelector.Generate(this.toolboxPanel.BodyObject);
         this.penSizeSample = new Components.PenSizeSample(100, 100, 5);
         this.penSizeSample.Generate(this.toolboxPanel.BodyObject);
+        this.backCanvasButton = new Components.Button();
+        this.backCanvasButton.Text = "戻る";
+        this.backCanvasButton.Generate(this.toolboxPanel.BodyObject);
+        this.clearCanvasButton = new Components.Button();
+        this.clearCanvasButton.IsOutline = true;
+        this.clearCanvasButton.Style = Components.ButtonStyle.danger;
+        this.clearCanvasButton.Text = "全消し";
+        this.clearCanvasButton.Generate(this.toolboxPanel.BodyObject, "delete");
         this.returnRoomListButton = new Components.Button();
         this.returnRoomListButton.Style = Components.ButtonStyle.danger;
         this.returnRoomListButton.Text = "退室";
@@ -158,9 +169,15 @@ var MainPage = (function () {
             _this.MyRoom = Components.Room.Parse(data.room);
             _this.imageLogs.AddImage(_this.canvas.CanvasElement.toDataURL());
             _this.canvas.Clear();
+            _this.canvas.clearHistories();
+            _this.canvas.addHistory();
         });
         this.connection.AddEventListener(Connections.Connection2Event.ChatReceive, function (data) {
             _this.chatLog.addMessage(new Components.ChatMessage(data.playerName, data.message));
+        });
+        this.connection.AddEventListener(Connections.Connection2Event.CanvasUpdated, function (data) {
+            _this.canvas.Clear();
+            _this.canvas.ShowImage(data.image);
         });
         this.canvas.LineDrawedEvent = function (data) { return _this.connection.SubmitDrawing(data, _this.myRoom.Id); };
         this.doneButton.ClickedEvent = function () {
@@ -175,6 +192,33 @@ var MainPage = (function () {
         this.chatInput.SendMessageEvent = function (msg) {
             _this.connection.ChatEmit(_this.myRoom.Id, _this.player.Name, msg);
         };
+        this.clearCanvasButton.ClickedEvent = function () {
+            if (_this.myRoom.CurrentPlayer.Id != _this.player.Id)
+                return;
+            if (!confirm("キャンバスを全消ししますか？"))
+                return;
+            _this.canvas.Clear();
+            var img = _this.canvas.CanvasElement.toDataURL();
+            _this.connection.CanvasUpdate(_this.myRoom.Id, img);
+            _this.canvas.addHistory();
+        };
+        this.backCanvasButton.ClickedEvent = function () {
+            if (_this.myRoom.CurrentPlayer.Id != _this.player.Id)
+                return;
+            _this.canvas.back(function () {
+                var img = _this.canvas.CanvasElement.toDataURL();
+                _this.connection.CanvasUpdate(_this.myRoom.Id, img);
+            });
+        };
+        $(document).on("keydown", function (e) {
+            // Ctrl + Z
+            if (e.ctrlKey && e.keyCode == 90) {
+                _this.canvas.back(function () {
+                    var img = _this.canvas.CanvasElement.toDataURL();
+                    _this.connection.CanvasUpdate(_this.myRoom.Id, img);
+                });
+            }
+        });
     };
     MainPage.prototype.Update = function () {
         if (!this.doneLoad)

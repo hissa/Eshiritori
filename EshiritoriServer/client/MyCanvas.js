@@ -27,6 +27,8 @@ var MyCanvas;
             this.pen = new Pen();
             this.addEventListeners();
             this.outArea = false;
+            this.Histories = [];
+            this.BackCursor = 0;
         }
         Object.defineProperty(Canvas.prototype, "LineWidth", {
             // アクセサ
@@ -101,11 +103,16 @@ var MyCanvas;
          * DataUrlから描画します。
          * @param image DataURL
          */
-        Canvas.prototype.ShowImage = function (image) {
+        Canvas.prototype.ShowImage = function (image, callback) {
             var _this = this;
+            if (callback === void 0) { callback = function () { }; }
             var img = new Image();
             img.src = image;
-            img.onload = function () { return _this.ctx.drawImage(img, 0, 0); };
+            //img.onload = () => this.ctx.drawImage(img, 0, 0);
+            img.onload = function () {
+                _this.ctx.drawImage(img, 0, 0);
+                callback();
+            };
         };
         /**
          * キャンバスをクリアします。
@@ -165,6 +172,10 @@ var MyCanvas;
             this.beforPoint = new Point(e.clientX - rect.left, e.clientY - rect.top);
         };
         Canvas.prototype.mouseUp = function (e) {
+            if (this.isDrawing) {
+                var img = this.CanvasElement.toDataURL();
+                this.addHistory(img);
+            }
             this.isDrawing = false;
         };
         Canvas.prototype.draw = function () {
@@ -183,6 +194,30 @@ var MyCanvas;
                 point: this.point.ToHash()
             });
             this.beforPoint = this.point;
+        };
+        Canvas.prototype.back = function (callback) {
+            if (callback === void 0) { callback = function () { }; }
+            this.BackCursor++;
+            if (this.Histories[this.BackCursor] == undefined)
+                return;
+            var url = this.Histories[this.BackCursor];
+            this.Clear();
+            this.ShowImage(url, callback);
+        };
+        Canvas.prototype.addHistory = function (dataUrl) {
+            if (this.BackCursor > 0) {
+                this.Histories.splice(0, this.BackCursor);
+            }
+            dataUrl = dataUrl == undefined ? this.CanvasElement.toDataURL() : dataUrl;
+            this.Histories.unshift(dataUrl);
+            this.BackCursor = 0;
+        };
+        /**
+         * 戻る機能の為の履歴をクリアします。
+         */
+        Canvas.prototype.clearHistories = function () {
+            this.Histories = [];
+            this.BackCursor = 0;
         };
         return Canvas;
     }());

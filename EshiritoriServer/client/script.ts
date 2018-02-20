@@ -23,6 +23,8 @@
     protected penSizeSelector: Components.PenSizeSelector = null;
     protected penSizeSample: Components.PenSizeSample = null;
     protected returnRoomListButton: Components.Button = null;
+    protected clearCanvasButton: Components.Button = null;
+    protected backCanvasButton: Components.Button = null;
     // イベント
     protected onload: () => void = () => { };
 
@@ -71,6 +73,7 @@
     protected MakeComponents() {
         this.canvas = new MyCanvas.Canvas(<HTMLCanvasElement>document.getElementById("canvas"));
         this.canvas.LineWidth = 5;
+        this.canvas.addHistory();
 
         this.toolboxPanel = new Components.CardPanel();
         this.toolboxPanel.HeaderText = "パレット";
@@ -134,6 +137,16 @@
         this.penSizeSample = new Components.PenSizeSample(100, 100, 5);
         this.penSizeSample.Generate(this.toolboxPanel.BodyObject);
 
+        this.backCanvasButton = new Components.Button();
+        this.backCanvasButton.Text = "戻る";
+        this.backCanvasButton.Generate(this.toolboxPanel.BodyObject);
+
+        this.clearCanvasButton = new Components.Button();
+        this.clearCanvasButton.IsOutline = true;
+        this.clearCanvasButton.Style = Components.ButtonStyle.danger;
+        this.clearCanvasButton.Text = "全消し";
+        this.clearCanvasButton.Generate(this.toolboxPanel.BodyObject, "delete");
+
         this.returnRoomListButton = new Components.Button();
         this.returnRoomListButton.Style = Components.ButtonStyle.danger;
         this.returnRoomListButton.Text = "退室";
@@ -163,9 +176,15 @@
             this.MyRoom = Components.Room.Parse(data.room);
             this.imageLogs.AddImage(this.canvas.CanvasElement.toDataURL());
             this.canvas.Clear();
+            this.canvas.clearHistories();
+            this.canvas.addHistory();
         });
         this.connection.AddEventListener(Connections.Connection2Event.ChatReceive, data => {
             this.chatLog.addMessage(new Components.ChatMessage(data.playerName, data.message));
+        });
+        this.connection.AddEventListener(Connections.Connection2Event.CanvasUpdated, data => {
+            this.canvas.Clear();
+            this.canvas.ShowImage(data.image);
         });
 
         this.canvas.LineDrawedEvent = data => this.connection.SubmitDrawing(data, this.myRoom.Id);
@@ -186,7 +205,34 @@
                 this.player.Name,
                 msg
             );
-        }
+        };
+
+        this.clearCanvasButton.ClickedEvent = () => {
+            if (this.myRoom.CurrentPlayer.Id != this.player.Id) return;
+            if (!confirm("キャンバスを全消ししますか？")) return;
+            this.canvas.Clear();
+            let img = this.canvas.CanvasElement.toDataURL();
+            this.connection.CanvasUpdate(this.myRoom.Id, img);
+            this.canvas.addHistory();
+        };
+
+        this.backCanvasButton.ClickedEvent = () => {
+            if (this.myRoom.CurrentPlayer.Id != this.player.Id) return;
+            this.canvas.back(() => {
+                let img = this.canvas.CanvasElement.toDataURL();
+                this.connection.CanvasUpdate(this.myRoom.Id, img);
+            });
+        };
+
+        $(document).on("keydown", e => {
+            // Ctrl + Z
+            if (e.ctrlKey && e.keyCode == 90) {
+                this.canvas.back(() => {
+                    let img = this.canvas.CanvasElement.toDataURL();
+                    this.connection.CanvasUpdate(this.myRoom.Id, img);
+                });
+            }
+        });
     }
 
     private Update() {

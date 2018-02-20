@@ -183,6 +183,11 @@ try {
         socket.on("ChatEmit", data => {
             io.in(data.roomId).emit("ChatReceive", { playerName: data.playerName, message: data.message });
         });
+
+        // キャンバスの状態が更新
+        socket.on("CanvasUpdate", data => {
+            socket.broadcast.to(data.roomId).emit("CanvasUpdated", { image: data.image });
+        });
     });
 } catch (e) {
     ShowError(e);

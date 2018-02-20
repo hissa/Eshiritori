@@ -105,7 +105,8 @@
         RoomUpdated,
         TurnAdd,
         connect,
-        ChatReceive
+        ChatReceive,
+        CanvasUpdated
     };
 
     export class Connection2 {
@@ -171,6 +172,13 @@
                 roomId: roomId,
                 playerName: playerName,
                 message: message
+            });
+        }
+
+        public CanvasUpdate(roomId: string, dataUrl: string) {
+            this.socket.emit("CanvasUpdate", {
+                roomId: roomId,
+                image: dataUrl
             });
         }
 

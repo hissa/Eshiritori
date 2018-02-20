@@ -103,9 +103,12 @@ div {
 #chatlogchatlog{
     height: 470px;
     overflow:auto;
-    /*TODO: 受信時にスクロールを一番下にする*/
 }
 
 #buttonreturn{
     margin-left: 80%;
+}
+
+#buttondelete{
+    margin-top:100px;
 }
