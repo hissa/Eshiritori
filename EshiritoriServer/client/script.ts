@@ -103,6 +103,7 @@
 
         this.chatInput = new Components.ChatInput();
         this.chatInput.Generate(this.chatPanel.BodyObject, "chatinput");
+        $("#chatinputchatinput").attr({ "onselectstart": "return true" });
 
         this.doneButton = new Components.Button();
         this.doneButton.Style = Components.ButtonStyle.primary;

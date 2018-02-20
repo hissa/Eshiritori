@@ -104,6 +104,7 @@ var MainPage = (function () {
         this.chatLog.Generate(this.chatPanel.BodyObject, "chatlog");
         this.chatInput = new Components.ChatInput();
         this.chatInput.Generate(this.chatPanel.BodyObject, "chatinput");
+        $("#chatinputchatinput").attr({ "onselectstart": "return true" });
         this.doneButton = new Components.Button();
         this.doneButton.Style = Components.ButtonStyle.primary;
         this.doneButton.Size = Components.ButtonSize.Large;
