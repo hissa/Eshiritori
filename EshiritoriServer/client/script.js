@@ -139,7 +139,7 @@ var MainPage = (function () {
         this.clearCanvasButton.IsOutline = true;
         this.clearCanvasButton.Style = Components.ButtonStyle.danger;
         this.clearCanvasButton.Text = "全消し";
-        this.clearCanvasButton.Generate(this.toolboxPanel.BodyObject);
+        this.clearCanvasButton.Generate(this.toolboxPanel.BodyObject, "delete");
         this.returnRoomListButton = new Components.Button();
         this.returnRoomListButton.Style = Components.ButtonStyle.danger;
         this.returnRoomListButton.Text = "退室";
