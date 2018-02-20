@@ -210,6 +210,15 @@ var MainPage = (function () {
                 _this.connection.CanvasUpdate(_this.myRoom.Id, img);
             });
         };
+        $(document).on("keydown", function (e) {
+            // Ctrl + Z
+            if (e.ctrlKey && e.keyCode == 90) {
+                _this.canvas.back(function () {
+                    var img = _this.canvas.CanvasElement.toDataURL();
+                    _this.connection.CanvasUpdate(_this.myRoom.Id, img);
+                });
+            }
+        });
     };
     MainPage.prototype.Update = function () {
         if (!this.doneLoad)

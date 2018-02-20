@@ -223,6 +223,16 @@
                 this.connection.CanvasUpdate(this.myRoom.Id, img);
             });
         };
+
+        $(document).on("keydown", e => {
+            // Ctrl + Z
+            if (e.ctrlKey && e.keyCode == 90) {
+                this.canvas.back(() => {
+                    let img = this.canvas.CanvasElement.toDataURL();
+                    this.connection.CanvasUpdate(this.myRoom.Id, img);
+                });
+            }
+        });
     }
 
     private Update() {
