@@ -1378,7 +1378,10 @@ namespace Components {
     export class ImageBox extends Component {
         private src = "";
         private unique = "";
+        private name = "";
+        private divObject: JQuery = null;
         private object: JQuery = null;
+        private nameObject: JQuery = null;
         private isGenerated = false;
 
         get IsGenerated(): boolean {
@@ -1395,15 +1398,31 @@ namespace Components {
             }
         }
 
+        get Name(): string {
+            return this.name;
+        }
+        set Name(value: string) {
+            this.name = value;
+            this.nameObject.text(this.name);
+        }
+
         get Object(): JQuery {
             return this.object;
         }
 
         public Generate(parent: JQuery, idName?: string) {
             this.unique = idName != undefined ? idName : UniqueIdGenerater.Get().toString();
-            parent.append(`<img id="img${this.unique}" />`);
+            parent.append(`<div id="img${this.unique}div" />`);
+            this.divObject = $(`#img${this.unique}div`);
+            this.divObject.append(`<img id="img${this.unique}" />`);
+            this.divObject.append(`<span id="img${this.unique}name" />`);
+            this.nameObject = $(`#img${this.unique}name`);
+            this.nameObject.addClass("imagelogName");
             this.object = $(`#img${this.unique}`);
             this.object.attr({ "src": this.src });
+            this.object.addClass("imagelogsimage");
+            this.divObject.addClass("imagelogDiv");
+            
             this.isGenerated = true;
         }
     }
@@ -1443,12 +1462,15 @@ namespace Components {
             this.isGenerate = true;
         }
 
-        public AddImage(src: string) {
+        public AddImage(src: string, name?: string) {
+            name == undefined ? "" : name;
             for (let i = this.images.length - 1; i >= 0; i--) {
                 if (i == 0) {
                     this.images[i].Src = src;
+                    this.images[i].Name = name;
                 } else {
                     this.images[i].Src = this.images[i - 1].Src;
+                    this.images[i].Name = this.images[i - 1].Name;
                 }
             }
         }

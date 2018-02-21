@@ -173,8 +173,9 @@
             this.MyRoom = Components.Room.Parse(data.room);
         });
         this.connection.AddEventListener(Connections.Connection2Event.TurnAdd, data => {
+            let lastName = this.myRoom.CurrentPlayer.Name;
             this.MyRoom = Components.Room.Parse(data.room);
-            this.imageLogs.AddImage(this.canvas.CanvasElement.toDataURL());
+            this.imageLogs.AddImage(this.canvas.CanvasElement.toDataURL(), lastName);
             this.canvas.Clear();
             this.canvas.clearHistories();
             this.canvas.addHistory();

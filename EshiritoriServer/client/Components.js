@@ -1625,7 +1625,10 @@ var Components;
             _super.apply(this, arguments);
             this.src = "";
             this.unique = "";
+            this.name = "";
+            this.divObject = null;
             this.object = null;
+            this.nameObject = null;
             this.isGenerated = false;
         }
         Object.defineProperty(ImageBox.prototype, "IsGenerated", {
@@ -1648,6 +1651,17 @@ var Components;
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(ImageBox.prototype, "Name", {
+            get: function () {
+                return this.name;
+            },
+            set: function (value) {
+                this.name = value;
+                this.nameObject.text(this.name);
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(ImageBox.prototype, "Object", {
             get: function () {
                 return this.object;
@@ -1657,9 +1671,16 @@ var Components;
         });
         ImageBox.prototype.Generate = function (parent, idName) {
             this.unique = idName != undefined ? idName : UniqueIdGenerater.Get().toString();
-            parent.append("<img id=\"img" + this.unique + "\" />");
+            parent.append("<div id=\"img" + this.unique + "div\" />");
+            this.divObject = $("#img" + this.unique + "div");
+            this.divObject.append("<img id=\"img" + this.unique + "\" />");
+            this.divObject.append("<span id=\"img" + this.unique + "name\" />");
+            this.nameObject = $("#img" + this.unique + "name");
+            this.nameObject.addClass("imagelogName");
             this.object = $("#img" + this.unique);
             this.object.attr({ "src": this.src });
+            this.object.addClass("imagelogsimage");
+            this.divObject.addClass("imagelogDiv");
             this.isGenerated = true;
         };
         return ImageBox;
@@ -1702,13 +1723,16 @@ var Components;
             });
             this.isGenerate = true;
         };
-        ImageLog.prototype.AddImage = function (src) {
+        ImageLog.prototype.AddImage = function (src, name) {
+            name == undefined ? "" : name;
             for (var i = this.images.length - 1; i >= 0; i--) {
                 if (i == 0) {
                     this.images[i].Src = src;
+                    this.images[i].Name = name;
                 }
                 else {
                     this.images[i].Src = this.images[i - 1].Src;
+                    this.images[i].Name = this.images[i - 1].Name;
                 }
             }
         };
