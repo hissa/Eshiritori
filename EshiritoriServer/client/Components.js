@@ -625,7 +625,7 @@ var Components;
          * コンストラクタ
          * @param sizes ペンの太さの配列
          */
-        function PenSizeSelector(sizes) {
+        function PenSizeSelector(sizes, defaultSize) {
             _super.call(this);
             this.isGenerated = false;
             this.sizes = [];
@@ -633,6 +633,7 @@ var Components;
             this.object = null;
             this.selectedEvent = function () { };
             this.sizes = sizes;
+            this.defaultSize = defaultSize == undefined ? 5 : defaultSize;
         }
         Object.defineProperty(PenSizeSelector.prototype, "IsGenerated", {
             get: function () {
@@ -667,7 +668,12 @@ var Components;
             this.object = $("#pensizeselector" + this.unique);
             this.object.addClass("custom-select");
             this.Sizez.forEach(function (value, index) {
-                _this.object.append("<option value=\"" + index + "\">" + value + "</option>");
+                if (_this.defaultSize == value) {
+                    _this.object.append("<option value=\"" + index + "\" selected>" + value + "</option>");
+                }
+                else {
+                    _this.object.append("<option value=\"" + index + "\">" + value + "</option>");
+                }
             });
             this.object.on("change", function (e) { return _this.selectedEvent(_this.Sizez[_this.object.val()]); });
             this.isGenerated = true;

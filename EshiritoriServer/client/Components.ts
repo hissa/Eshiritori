@@ -534,6 +534,7 @@ namespace Components {
     export class PenSizeSelector extends Component {
         private isGenerated = false;
         private sizes: number[] = [];
+        private defaultSize: number;
         private unique: string = null;
         private object: JQuery = null;
         private selectedEvent: (value: number) => void = () => { };
@@ -554,9 +555,10 @@ namespace Components {
          * コンストラクタ
          * @param sizes ペンの太さの配列
          */
-        constructor(sizes: number[]) {
+        constructor(sizes: number[], defaultSize?:number) {
             super();
             this.sizes = sizes;
+            this.defaultSize = defaultSize == undefined ? 5 : defaultSize;
         }
 
         /**
@@ -570,7 +572,11 @@ namespace Components {
             this.object = $(`#pensizeselector${this.unique}`);
             this.object.addClass("custom-select");
             this.Sizez.forEach((value, index) => {
-                this.object.append(`<option value="${index}">${value}</option>`);
+                if (this.defaultSize == value) {
+                    this.object.append(`<option value="${index}" selected>${value}</option>`);
+                } else {
+                    this.object.append(`<option value="${index}">${value}</option>`);
+                }
             });
             this.object.on("change", e => this.selectedEvent(this.Sizez[this.object.val()]));
             this.isGenerated = true;

@@ -131,8 +131,8 @@
         });
 
         this.penSizeSelector = new Components.PenSizeSelector([
-            5, 10, 20, 30, 50, 80, 100
-        ]);
+            1, 5, 10, 20, 30, 50, 80, 100
+        ], 5);
         this.penSizeSelector.Generate(this.toolboxPanel.BodyObject);
 
         this.penSizeSample = new Components.PenSizeSample(100, 100, 5);
