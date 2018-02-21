@@ -625,7 +625,7 @@ var Components;
          * コンストラクタ
          * @param sizes ペンの太さの配列
          */
-        function PenSizeSelector(sizes) {
+        function PenSizeSelector(sizes, defaultSize) {
             _super.call(this);
             this.isGenerated = false;
             this.sizes = [];
@@ -633,6 +633,7 @@ var Components;
             this.object = null;
             this.selectedEvent = function () { };
             this.sizes = sizes;
+            this.defaultSize = defaultSize == undefined ? 5 : defaultSize;
         }
         Object.defineProperty(PenSizeSelector.prototype, "IsGenerated", {
             get: function () {
@@ -667,7 +668,12 @@ var Components;
             this.object = $("#pensizeselector" + this.unique);
             this.object.addClass("custom-select");
             this.Sizez.forEach(function (value, index) {
-                _this.object.append("<option value=\"" + index + "\">" + value + "</option>");
+                if (_this.defaultSize == value) {
+                    _this.object.append("<option value=\"" + index + "\" selected>" + value + "</option>");
+                }
+                else {
+                    _this.object.append("<option value=\"" + index + "\">" + value + "</option>");
+                }
             });
             this.object.on("change", function (e) { return _this.selectedEvent(_this.Sizez[_this.object.val()]); });
             this.isGenerated = true;
@@ -1619,7 +1625,10 @@ var Components;
             _super.apply(this, arguments);
             this.src = "";
             this.unique = "";
+            this.name = "";
+            this.divObject = null;
             this.object = null;
+            this.nameObject = null;
             this.isGenerated = false;
         }
         Object.defineProperty(ImageBox.prototype, "IsGenerated", {
@@ -1642,6 +1651,17 @@ var Components;
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(ImageBox.prototype, "Name", {
+            get: function () {
+                return this.name;
+            },
+            set: function (value) {
+                this.name = value;
+                this.nameObject.text(this.name);
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(ImageBox.prototype, "Object", {
             get: function () {
                 return this.object;
@@ -1651,9 +1671,16 @@ var Components;
         });
         ImageBox.prototype.Generate = function (parent, idName) {
             this.unique = idName != undefined ? idName : UniqueIdGenerater.Get().toString();
-            parent.append("<img id=\"img" + this.unique + "\" />");
+            parent.append("<div id=\"img" + this.unique + "div\" />");
+            this.divObject = $("#img" + this.unique + "div");
+            this.divObject.append("<img id=\"img" + this.unique + "\" />");
+            this.divObject.append("<span id=\"img" + this.unique + "name\" />");
+            this.nameObject = $("#img" + this.unique + "name");
+            this.nameObject.addClass("imagelogName");
             this.object = $("#img" + this.unique);
             this.object.attr({ "src": this.src });
+            this.object.addClass("imagelogsimage");
+            this.divObject.addClass("imagelogDiv");
             this.isGenerated = true;
         };
         return ImageBox;
@@ -1661,13 +1688,15 @@ var Components;
     Components.ImageBox = ImageBox;
     var ImageLog = (function (_super) {
         __extends(ImageLog, _super);
-        function ImageLog(logNumber) {
+        function ImageLog(logNumber, arrowImgUrl) {
             _super.call(this);
             this.isGenerate = false;
             this.unique = "";
             this.images = [];
             this.logNumber = 0;
+            this.arrowImage = "";
             this.logNumber = logNumber;
+            this.arrowImage = arrowImgUrl == undefined ? "" : arrowImgUrl;
             for (var i = 0; i < logNumber; i++) {
                 this.images.push(new ImageBox());
             }
@@ -1684,17 +1713,26 @@ var Components;
             this.unique = idName != undefined ? idName : UniqueIdGenerater.Get().toString();
             this.images.forEach(function (value, index) {
                 value.Generate(parent, "log" + _this.unique + "-" + index);
+                if (_this.arrowImage != "" && index != _this.logNumber - 1) {
+                    var arrow = new Image();
+                    arrow.src = _this.arrowImage;
+                    parent.append(arrow);
+                    $(arrow).addClass("logArrow");
+                }
                 value.Object.addClass("imageLog");
             });
             this.isGenerate = true;
         };
-        ImageLog.prototype.AddImage = function (src) {
+        ImageLog.prototype.AddImage = function (src, name) {
+            name == undefined ? "" : name;
             for (var i = this.images.length - 1; i >= 0; i--) {
                 if (i == 0) {
                     this.images[i].Src = src;
+                    this.images[i].Name = name;
                 }
                 else {
                     this.images[i].Src = this.images[i - 1].Src;
+                    this.images[i].Name = this.images[i - 1].Name;
                 }
             }
         };

@@ -103,6 +103,7 @@
 
         this.chatInput = new Components.ChatInput();
         this.chatInput.Generate(this.chatPanel.BodyObject, "chatinput");
+        $("#chatinputchatinput").attr({ "onselectstart": "return true" });
 
         this.doneButton = new Components.Button();
         this.doneButton.Style = Components.ButtonStyle.primary;
@@ -110,7 +111,7 @@
         this.doneButton.Text = "完了";
         this.doneButton.Generate($("#yourTurn"), "done");
 
-        this.imageLogs = new Components.ImageLog(5);
+        this.imageLogs = new Components.ImageLog(5, "arrow.png");
         this.imageLogs.Generate(this.drawLogsPanel.BodyObject, "log");
 
         this.toolboxPanel.BodyObject.append("<input type=\"text\" id=\"colorPicker\">");
@@ -130,8 +131,8 @@
         });
 
         this.penSizeSelector = new Components.PenSizeSelector([
-            5, 10, 20, 30, 50, 80, 100
-        ]);
+            1, 5, 10, 20, 30, 50, 80, 100
+        ], 5);
         this.penSizeSelector.Generate(this.toolboxPanel.BodyObject);
 
         this.penSizeSample = new Components.PenSizeSample(100, 100, 5);
@@ -169,12 +170,12 @@
             });
         });
         this.connection.AddEventListener(Connections.Connection2Event.RoomUpdated, data => {
-            console.log(data);
             this.MyRoom = Components.Room.Parse(data.room);
         });
         this.connection.AddEventListener(Connections.Connection2Event.TurnAdd, data => {
+            let lastName = this.myRoom.CurrentPlayer.Name;
             this.MyRoom = Components.Room.Parse(data.room);
-            this.imageLogs.AddImage(this.canvas.CanvasElement.toDataURL());
+            this.imageLogs.AddImage(this.canvas.CanvasElement.toDataURL(), lastName);
             this.canvas.Clear();
             this.canvas.clearHistories();
             this.canvas.addHistory();

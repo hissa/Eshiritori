@@ -534,6 +534,7 @@ namespace Components {
     export class PenSizeSelector extends Component {
         private isGenerated = false;
         private sizes: number[] = [];
+        private defaultSize: number;
         private unique: string = null;
         private object: JQuery = null;
         private selectedEvent: (value: number) => void = () => { };
@@ -554,9 +555,10 @@ namespace Components {
          * コンストラクタ
          * @param sizes ペンの太さの配列
          */
-        constructor(sizes: number[]) {
+        constructor(sizes: number[], defaultSize?:number) {
             super();
             this.sizes = sizes;
+            this.defaultSize = defaultSize == undefined ? 5 : defaultSize;
         }
 
         /**
@@ -570,7 +572,11 @@ namespace Components {
             this.object = $(`#pensizeselector${this.unique}`);
             this.object.addClass("custom-select");
             this.Sizez.forEach((value, index) => {
-                this.object.append(`<option value="${index}">${value}</option>`);
+                if (this.defaultSize == value) {
+                    this.object.append(`<option value="${index}" selected>${value}</option>`);
+                } else {
+                    this.object.append(`<option value="${index}">${value}</option>`);
+                }
             });
             this.object.on("change", e => this.selectedEvent(this.Sizez[this.object.val()]));
             this.isGenerated = true;
@@ -1372,7 +1378,10 @@ namespace Components {
     export class ImageBox extends Component {
         private src = "";
         private unique = "";
+        private name = "";
+        private divObject: JQuery = null;
         private object: JQuery = null;
+        private nameObject: JQuery = null;
         private isGenerated = false;
 
         get IsGenerated(): boolean {
@@ -1389,15 +1398,31 @@ namespace Components {
             }
         }
 
+        get Name(): string {
+            return this.name;
+        }
+        set Name(value: string) {
+            this.name = value;
+            this.nameObject.text(this.name);
+        }
+
         get Object(): JQuery {
             return this.object;
         }
 
         public Generate(parent: JQuery, idName?: string) {
             this.unique = idName != undefined ? idName : UniqueIdGenerater.Get().toString();
-            parent.append(`<img id="img${this.unique}" />`);
+            parent.append(`<div id="img${this.unique}div" />`);
+            this.divObject = $(`#img${this.unique}div`);
+            this.divObject.append(`<img id="img${this.unique}" />`);
+            this.divObject.append(`<span id="img${this.unique}name" />`);
+            this.nameObject = $(`#img${this.unique}name`);
+            this.nameObject.addClass("imagelogName");
             this.object = $(`#img${this.unique}`);
             this.object.attr({ "src": this.src });
+            this.object.addClass("imagelogsimage");
+            this.divObject.addClass("imagelogDiv");
+            
             this.isGenerated = true;
         }
     }
@@ -1407,14 +1432,16 @@ namespace Components {
         private unique = "";
         private images: ImageBox[] = [];
         private logNumber = 0;
+        private arrowImage = "";
 
         get IsGenerated(): boolean {
             return this.isGenerate;
         }
 
-        constructor(logNumber: number) {
+        constructor(logNumber: number, arrowImgUrl?: string) {
             super();
             this.logNumber = logNumber;
+            this.arrowImage = arrowImgUrl == undefined ? "" : arrowImgUrl;
             for (let i = 0; i < logNumber; i++) {
                 this.images.push(new ImageBox());
             }
@@ -1424,17 +1451,26 @@ namespace Components {
             this.unique = idName != undefined ? idName : UniqueIdGenerater.Get().toString();
             this.images.forEach((value, index) => {
                 value.Generate(parent, `log${this.unique}-${index}`);
+                if (this.arrowImage != "" && index != this.logNumber - 1) {
+                    let arrow = new Image();
+                    arrow.src = this.arrowImage;
+                    parent.append(arrow);
+                    $(arrow).addClass("logArrow");
+                }
                 value.Object.addClass("imageLog");
             });
             this.isGenerate = true;
         }
 
-        public AddImage(src: string) {
+        public AddImage(src: string, name?: string) {
+            name == undefined ? "" : name;
             for (let i = this.images.length - 1; i >= 0; i--) {
                 if (i == 0) {
                     this.images[i].Src = src;
+                    this.images[i].Name = name;
                 } else {
                     this.images[i].Src = this.images[i - 1].Src;
+                    this.images[i].Name = this.images[i - 1].Name;
                 }
             }
         }

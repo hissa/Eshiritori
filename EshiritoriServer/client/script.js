@@ -104,12 +104,13 @@ var MainPage = (function () {
         this.chatLog.Generate(this.chatPanel.BodyObject, "chatlog");
         this.chatInput = new Components.ChatInput();
         this.chatInput.Generate(this.chatPanel.BodyObject, "chatinput");
+        $("#chatinputchatinput").attr({ "onselectstart": "return true" });
         this.doneButton = new Components.Button();
         this.doneButton.Style = Components.ButtonStyle.primary;
         this.doneButton.Size = Components.ButtonSize.Large;
         this.doneButton.Text = "完了";
         this.doneButton.Generate($("#yourTurn"), "done");
-        this.imageLogs = new Components.ImageLog(5);
+        this.imageLogs = new Components.ImageLog(5, "arrow.png");
         this.imageLogs.Generate(this.drawLogsPanel.BodyObject, "log");
         this.toolboxPanel.BodyObject.append("<input type=\"text\" id=\"colorPicker\">");
         this.colorPalette = $("#colorPicker");
@@ -127,8 +128,8 @@ var MainPage = (function () {
             change: function (color) { return _this.canvas.LineColor = color.toRgbString(); }
         });
         this.penSizeSelector = new Components.PenSizeSelector([
-            5, 10, 20, 30, 50, 80, 100
-        ]);
+            1, 5, 10, 20, 30, 50, 80, 100
+        ], 5);
         this.penSizeSelector.Generate(this.toolboxPanel.BodyObject);
         this.penSizeSample = new Components.PenSizeSample(100, 100, 5);
         this.penSizeSample.Generate(this.toolboxPanel.BodyObject);
@@ -162,12 +163,12 @@ var MainPage = (function () {
             });
         });
         this.connection.AddEventListener(Connections.Connection2Event.RoomUpdated, function (data) {
-            console.log(data);
             _this.MyRoom = Components.Room.Parse(data.room);
         });
         this.connection.AddEventListener(Connections.Connection2Event.TurnAdd, function (data) {
+            var lastName = _this.myRoom.CurrentPlayer.Name;
             _this.MyRoom = Components.Room.Parse(data.room);
-            _this.imageLogs.AddImage(_this.canvas.CanvasElement.toDataURL());
+            _this.imageLogs.AddImage(_this.canvas.CanvasElement.toDataURL(), lastName);
             _this.canvas.Clear();
             _this.canvas.clearHistories();
             _this.canvas.addHistory();
