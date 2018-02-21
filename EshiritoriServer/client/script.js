@@ -163,7 +163,6 @@ var MainPage = (function () {
             });
         });
         this.connection.AddEventListener(Connections.Connection2Event.RoomUpdated, function (data) {
-            console.log(data);
             _this.MyRoom = Components.Room.Parse(data.room);
         });
         this.connection.AddEventListener(Connections.Connection2Event.TurnAdd, function (data) {

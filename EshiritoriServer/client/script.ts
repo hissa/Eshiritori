@@ -170,7 +170,6 @@
             });
         });
         this.connection.AddEventListener(Connections.Connection2Event.RoomUpdated, data => {
-            console.log(data);
             this.MyRoom = Components.Room.Parse(data.room);
         });
         this.connection.AddEventListener(Connections.Connection2Event.TurnAdd, data => {
