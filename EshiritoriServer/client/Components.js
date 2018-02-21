@@ -1667,13 +1667,15 @@ var Components;
     Components.ImageBox = ImageBox;
     var ImageLog = (function (_super) {
         __extends(ImageLog, _super);
-        function ImageLog(logNumber) {
+        function ImageLog(logNumber, arrowImgUrl) {
             _super.call(this);
             this.isGenerate = false;
             this.unique = "";
             this.images = [];
             this.logNumber = 0;
+            this.arrowImage = "";
             this.logNumber = logNumber;
+            this.arrowImage = arrowImgUrl == undefined ? "" : arrowImgUrl;
             for (var i = 0; i < logNumber; i++) {
                 this.images.push(new ImageBox());
             }
@@ -1690,6 +1692,12 @@ var Components;
             this.unique = idName != undefined ? idName : UniqueIdGenerater.Get().toString();
             this.images.forEach(function (value, index) {
                 value.Generate(parent, "log" + _this.unique + "-" + index);
+                if (_this.arrowImage != "" && index != _this.logNumber - 1) {
+                    var arrow = new Image();
+                    arrow.src = _this.arrowImage;
+                    parent.append(arrow);
+                    $(arrow).addClass("logArrow");
+                }
                 value.Object.addClass("imageLog");
             });
             this.isGenerate = true;

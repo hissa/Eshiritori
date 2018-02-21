@@ -111,7 +111,7 @@
         this.doneButton.Text = "完了";
         this.doneButton.Generate($("#yourTurn"), "done");
 
-        this.imageLogs = new Components.ImageLog(5);
+        this.imageLogs = new Components.ImageLog(5, "arrow.png");
         this.imageLogs.Generate(this.drawLogsPanel.BodyObject, "log");
 
         this.toolboxPanel.BodyObject.append("<input type=\"text\" id=\"colorPicker\">");

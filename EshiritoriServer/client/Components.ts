@@ -1413,14 +1413,16 @@ namespace Components {
         private unique = "";
         private images: ImageBox[] = [];
         private logNumber = 0;
+        private arrowImage = "";
 
         get IsGenerated(): boolean {
             return this.isGenerate;
         }
 
-        constructor(logNumber: number) {
+        constructor(logNumber: number, arrowImgUrl?: string) {
             super();
             this.logNumber = logNumber;
+            this.arrowImage = arrowImgUrl == undefined ? "" : arrowImgUrl;
             for (let i = 0; i < logNumber; i++) {
                 this.images.push(new ImageBox());
             }
@@ -1430,6 +1432,12 @@ namespace Components {
             this.unique = idName != undefined ? idName : UniqueIdGenerater.Get().toString();
             this.images.forEach((value, index) => {
                 value.Generate(parent, `log${this.unique}-${index}`);
+                if (this.arrowImage != "" && index != this.logNumber - 1) {
+                    let arrow = new Image();
+                    arrow.src = this.arrowImage;
+                    parent.append(arrow);
+                    $(arrow).addClass("logArrow");
+                }
                 value.Object.addClass("imageLog");
             });
             this.isGenerate = true;
